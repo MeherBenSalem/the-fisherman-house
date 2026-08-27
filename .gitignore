@@ -1,0 +1,37 @@
+# Gradle
+.gradle/
+build/
+**/build/
+out/
+bin/
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.classpath
+.project
+.settings/
+
+# Minecraft run directories
+**/run/
+**/runs/
+
+# Generated resources
+**/src/generated/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Env / secrets
+.env
+.env.*
+*.pem
+*.jks
+credentials.json

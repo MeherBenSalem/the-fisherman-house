@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${version}",
+  "name": "${mod_name}",
+  "description": "${description}",
+  "authors": [
+    "${mod_author}"
+  ],
+  "contact": {
+    "homepage": "https://github.com/MeherBenSalem/the-fisherman-house",
+    "sources": "https://github.com/MeherBenSalem/the-fisherman-house"
+  },
+  "license": "${license}",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "tn.nightbeam.fishermanhouse.FishermanHouseMod"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.14",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}",
+    "java": ">=17"
+  }
+}

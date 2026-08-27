@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:jigsaw",
+  "start_pool": "fisherman_house:fisherman_house",
+  "size": 1,
+  "max_distance_from_center": 64,
+  "spawn_overrides": {},
+  "step": "lakes",
+  "terrain_adaptation": "beard_box",
+  "start_height": {
+    "type": "minecraft:uniform",
+    "min_inclusive": { "absolute": 59 },
+    "max_inclusive": { "absolute": 60 }
+  },
+  "biomes": "minecraft:beach",
+  "use_expansion_hack": false
+}
