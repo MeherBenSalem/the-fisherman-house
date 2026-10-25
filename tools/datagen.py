@@ -464,15 +464,13 @@ def crab_pot_models():
     elements += [box([3, 1, 1.5], [13, 10, 1.5], net, ('north', 'south')), box([3, 1, 14.5], [13, 10, 14.5], net, ('north', 'south')),
                  box([1.5, 1, 3], [1.5, 10, 13], net, ('east', 'west')), box([14.5, 1, 3], [14.5, 10, 13], net, ('east', 'west')),
                  box([3, 10.5, 3], [13, 10.5, 13], net, ('up', 'down'))]
-    # The funnel opening on the front: a darker ring of netting.
-    elements.append(box([6, 3, 1], [10, 7, 2], wood, ('north', 'south', 'up', 'down')))
-    # Rope handle on top.
-    elements += [box([7, 11, 2], [9, 13, 3], wood, ('north', 'south', 'east', 'west', 'up')),
-                 box([7, 11, 13], [9, 13, 14], wood, ('north', 'south', 'east', 'west', 'up')),
-                 box([7, 13, 2], [9, 14, 14], '#rope', ('north', 'south', 'east', 'west', 'up', 'down'))]
+    # A rope from the top of the pot to a red and white buoy.
+    elements += [box([7.5, 11, 7.5], [8.5, 12.5, 8.5], '#rope', ('north', 'south', 'east', 'west')),
+                 box([6, 12.5, 6], [10, 16, 10], '#buoy', uv=[0, 0, 16, 16])]
     base = {'parent': 'minecraft:block/block', 'render_type': 'minecraft:cutout',
             'textures': {'wood': f'{NS}:block/crab_pot_wood', 'net': f'{NS}:block/crab_pot_net',
-                         'rope': f'{NS}:block/fishing_net', 'particle': f'{NS}:block/crab_pot_wood'},
+                         'rope': f'{NS}:block/crab_pot_wood', 'buoy': f'{NS}:block/crab_pot_buoy',
+                         'particle': f'{NS}:block/crab_pot_wood'},
             'elements': elements,
             'display': {'gui': {'rotation': [30, 225, 0], 'translation': [0, 0, 0], 'scale': [0.625, 0.625, 0.625]},
                         'ground': {'rotation': [0, 0, 0], 'translation': [0, 3, 0], 'scale': [0.25, 0.25, 0.25]},
@@ -488,7 +486,7 @@ def crab_pot_models():
                     'east': {'uv': [3, 10, 13, 15], 'texture': '#bait'}, 'west': {'uv': [3, 10, 13, 15], 'texture': '#bait'}}}]}
     catch = {'parent': 'minecraft:block/block', 'render_type': 'minecraft:cutout', 'textures': {'fish': f'{NS}:block/crab_pot_fish',
                                                                                              'particle': f'{NS}:block/crab_pot_fish'},
-             'elements': [{'from': [2, 3, 6], 'to': [14, 9, 6], 'faces': {
+             'elements': [{'from': [2, 2, 6], 'to': [14, 10, 6], 'faces': {
                  'north': {'uv': [1, 5, 15, 11], 'texture': '#fish'}, 'south': {'uv': [15, 5, 1, 11], 'texture': '#fish'}}},
                  {'from': [9, 2, 3], 'to': [9, 7, 13], 'faces': {
                      'east': {'uv': [15, 5, 1, 11], 'texture': '#fish'}, 'west': {'uv': [1, 5, 15, 11], 'texture': '#fish'}}}]}

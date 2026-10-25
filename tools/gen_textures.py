@@ -31,7 +31,7 @@ def hexa(code, alpha=255):
 
 
 WOOD = {'a': hexa('7a5a35'), 'b': hexa('8f6b40'), 'c': hexa('5e4327'), 'd': hexa('a07a4a'), 'e': hexa('4a3420')}
-ROPE = {'r': hexa('c9a66b'), 'k': hexa('8a6a3a'), 'l': hexa('e0c48c')}
+ROPE = {'r': hexa('d8b97e'), 'k': hexa('8a6a3a'), 'l': hexa('e0c48c')}
 
 # Weathered spruce slats with dark grain and nail heads: posts, base and rim of the pot.
 draw('block/crab_pot_wood', """
@@ -53,25 +53,39 @@ aaaaaaaaaeaaaaaa
 cccccccccccccccc
 """, WOOD)
 
-# Diamond-mesh netting with knots, transparent between the strands: the pot's walls.
-draw('block/crab_pot_net', """
-k..r...kk...r..k
-.r..r.r..r.r..r.
-..r..k....k..r..
-...rr.r..r.rr...
-r..kk..rr..kk..r
-.rr..r.kk.r..rr.
-.kr...r..r...rk.
-r..r.r....r.r..r
-k...k......k...k
-r..r.r....r.r..r
-.kr...r..r...rk.
-.rr..r.kk.r..rr.
-r..kk..rr..kk..r
-...rr.r..r.rr...
-..r..k....k..r..
-.r..r.r..r.r..r.
-""", ROPE)
+# Open diamond-mesh netting (a cell every 8 pixels) with darker knots: the pot's walls, mostly see-through.
+def mesh(name, spacing=8):
+    rows = []
+    for y in range(16):
+        row = ''
+        for x in range(16):
+            a, b = (x + y) % spacing == 0, (x - y) % spacing == 0
+            row += 'k' if a and b else ('r' if a or b else '.')
+        rows.append(row)
+    draw(name, '\n'.join(rows), ROPE)
+
+
+mesh('block/crab_pot_net', spacing=4)
+
+# The pot's buoy: red and white bands with a dark rim.
+draw('block/crab_pot_buoy', """
+wwwwwwwwwwwwwwww
+wwwwwwwwwwwwwwww
+WwwwwwwwwwwwwwwW
+RRRRRRRRRRRRRRRR
+rrrrrrrrrrrrrrrr
+rrrrrrrrrrrrrrrr
+RRRRRRRRRRRRRRRR
+wwwwwwwwwwwwwwww
+wwwwwwwwwwwwwwww
+WWWWWWWWWWWWWWWW
+RRRRRRRRRRRRRRRR
+rrrrrrrrrrrrrrrr
+rrrrrrrrrrrrrrrr
+RRRRRRRRRRRRRRRR
+wwwwwwwwwwwwwwww
+WWWWWWWWWWWWWWWW
+""", {'w': hexa('f2efe6'), 'W': hexa('cfcabd'), 'r': hexa('d8402f'), 'R': hexa('a62c22')})
 
 # A hanging fishing net: a top rope with cork floats and an open mesh below.
 draw('block/fishing_net', """
