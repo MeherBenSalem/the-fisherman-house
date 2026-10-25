@@ -538,7 +538,8 @@ def loader_data(d: Dialect):
         else:
             modifier = {'type': 'neoforge:add_table', 'conditions': [{'condition': 'neoforge:loot_table_id', 'loot_table_id': 'minecraft:gameplay/fishing'}],
                         'table': f'{NS}:gameplay/rod_extras'}
-            if d.v == '1.21.1':
+            # NeoForge reads the modifier folder on its own from 26.2; before that, only what this list names.
+            if d.v in ('1.21.1', '26.1.2'):
                 write(data / 'neoforge/loot_modifiers/global_loot_modifiers.json', {'replace': False, 'entries': [f'{NS}:rod_extras']})
         write(data / NS / 'loot_modifiers/rod_extras.json', modifier)
 
