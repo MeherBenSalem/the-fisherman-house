@@ -1,0 +1,83 @@
+{
+  "type": "fisherman_house:coastal",
+  "biomes": "#fisherman_house:has_structure/lighthouse",
+  "step": "surface_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "none",
+  "template": "fisherman_house:lighthouse",
+  "config_name": "lighthouse",
+  "site": {
+    "mode": "land",
+    "max_slope": 3,
+    "min_depth": 2,
+    "max_above_sea": 10,
+    "any_wet": true,
+    "y_offset": -6
+  },
+  "anchor": [
+    6,
+    6
+  ],
+  "dry": [
+    [
+      6,
+      6
+    ],
+    [
+      3,
+      3
+    ],
+    [
+      9,
+      9
+    ],
+    [
+      3,
+      9
+    ],
+    [
+      9,
+      3
+    ],
+    [
+      16,
+      6
+    ]
+  ],
+  "wet": [
+    [
+      19,
+      6
+    ],
+    [
+      15,
+      15
+    ],
+    [
+      6,
+      19
+    ],
+    [
+      -3,
+      15
+    ],
+    [
+      -7,
+      6
+    ],
+    [
+      -3,
+      -3
+    ],
+    [
+      6,
+      -7
+    ],
+    [
+      15,
+      -3
+    ]
+  ],
+  "around": [],
+  "search": 2
+}

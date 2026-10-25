@@ -1,11 +1,18 @@
 {
   "structures": [
-    { "structure": "fisherman_house:fisherman_house", "weight": 1 }
+    {
+      "structure": "fisherman_house:fisherman_house",
+      "weight": 1
+    }
   ],
   "placement": {
     "type": "minecraft:random_spread",
-    "spacing": 300,
-    "separation": 5,
-    "salt": 2137805844
+    "spacing": 18,
+    "separation": 7,
+    "salt": 2137805844,
+    "exclusion_zone": {
+      "other_set": "minecraft:villages",
+      "chunk_count": 4
+    }
   }
 }

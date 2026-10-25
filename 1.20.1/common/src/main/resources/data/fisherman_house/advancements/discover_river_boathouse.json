@@ -1,0 +1,42 @@
+{
+  "parent": "fisherman_house:root",
+  "display": {
+    "icon": {
+      "item": "minecraft:oak_boat"
+    },
+    "title": {
+      "translate": "advancements.fisherman_house.discover_river_boathouse.title",
+      "fallback": "Up the River"
+    },
+    "description": {
+      "translate": "advancements.fisherman_house.discover_river_boathouse.description",
+      "fallback": "Find a River Boathouse"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "entered": {
+      "trigger": "minecraft:location",
+      "conditions": {
+        "player": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "location": {
+                "structure": "fisherman_house:river_boathouse"
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "entered"
+    ]
+  ]
+}

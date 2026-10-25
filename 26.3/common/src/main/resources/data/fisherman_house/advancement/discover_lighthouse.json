@@ -1,0 +1,40 @@
+{
+  "parent": "fisherman_house:root",
+  "display": {
+    "icon": {
+      "id": "minecraft:lantern"
+    },
+    "title": {
+      "translate": "advancements.fisherman_house.discover_lighthouse.title",
+      "fallback": "Keeper of the Light"
+    },
+    "description": {
+      "translate": "advancements.fisherman_house.discover_lighthouse.description",
+      "fallback": "Find a Lighthouse"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "entered": {
+      "trigger": "minecraft:location",
+      "conditions": {
+        "player": {
+          "type": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "minecraft:location": {
+              "structures": "fisherman_house:lighthouse"
+            }
+          }
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "entered"
+    ]
+  ]
+}

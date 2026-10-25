@@ -1,0 +1,37 @@
+{
+  "parent": "fisherman_house:root",
+  "display": {
+    "icon": {
+      "id": "fisherman_house:message_in_a_bottle"
+    },
+    "title": {
+      "translate": "advancements.fisherman_house.open_bottle.title",
+      "fallback": "Message Received"
+    },
+    "description": {
+      "translate": "advancements.fisherman_house.open_bottle.description",
+      "fallback": "Open a Message in a Bottle"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "opened": {
+      "trigger": "minecraft:consume_item",
+      "conditions": {
+        "item": {
+          "items": "fisherman_house:message_in_a_bottle"
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "opened"
+    ]
+  ],
+  "rewards": {
+    "experience": 20
+  }
+}

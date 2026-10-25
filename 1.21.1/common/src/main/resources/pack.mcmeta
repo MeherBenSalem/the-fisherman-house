@@ -1,6 +1,6 @@
-﻿{
-    "pack": {
-        "description": "${mod_name}",
-        "pack_format": 48
-    }
+{
+  "pack": {
+    "description": "Fisherman's Coast resources",
+    "pack_format": 34
+  }
 }

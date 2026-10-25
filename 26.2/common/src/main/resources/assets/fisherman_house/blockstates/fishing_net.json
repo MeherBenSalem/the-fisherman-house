@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "fisherman_house:block/fishing_net"
+    },
+    "facing=east": {
+      "model": "fisherman_house:block/fishing_net",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "fisherman_house:block/fishing_net",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "fisherman_house:block/fishing_net",
+      "y": 270
+    }
+  }
+}

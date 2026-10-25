@@ -1,0 +1,74 @@
+{
+  "parent": "minecraft:block/block",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "fish": "fisherman_house:block/crab_pot_fish",
+    "particle": "fisherman_house:block/crab_pot_fish"
+  },
+  "elements": [
+    {
+      "from": [
+        2,
+        3,
+        6
+      ],
+      "to": [
+        14,
+        9,
+        6
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            1,
+            5,
+            15,
+            11
+          ],
+          "texture": "#fish"
+        },
+        "south": {
+          "uv": [
+            15,
+            5,
+            1,
+            11
+          ],
+          "texture": "#fish"
+        }
+      }
+    },
+    {
+      "from": [
+        9,
+        2,
+        3
+      ],
+      "to": [
+        9,
+        7,
+        13
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            15,
+            5,
+            1,
+            11
+          ],
+          "texture": "#fish"
+        },
+        "west": {
+          "uv": [
+            1,
+            5,
+            15,
+            11
+          ],
+          "texture": "#fish"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "parent": "fisherman_house:root",
+  "display": {
+    "icon": {
+      "id": "minecraft:fishing_rod"
+    },
+    "title": {
+      "translate": "advancements.fisherman_house.discover_fisherman_house.title",
+      "fallback": "Home of Saylor"
+    },
+    "description": {
+      "translate": "advancements.fisherman_house.discover_fisherman_house.description",
+      "fallback": "Find a Fisherman's Cottage"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "entered": {
+      "trigger": "minecraft:location",
+      "conditions": {
+        "player": {
+          "type": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "minecraft:location": {
+              "structures": "fisherman_house:fisherman_house"
+            }
+          }
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "entered"
+    ]
+  ]
+}

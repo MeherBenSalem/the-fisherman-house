@@ -1,0 +1,159 @@
+{
+  "parent": "fisherman_house:root",
+  "display": {
+    "icon": {
+      "item": "minecraft:spyglass"
+    },
+    "title": {
+      "translate": "advancements.fisherman_house.all_structures.title",
+      "fallback": "Coastal Wanderer"
+    },
+    "description": {
+      "translate": "advancements.fisherman_house.all_structures.description",
+      "fallback": "Visit all seven of the coast's places"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "fisherman_house": {
+      "trigger": "minecraft:location",
+      "conditions": {
+        "player": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "location": {
+                "structure": "fisherman_house:fisherman_house"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "harbour_pier": {
+      "trigger": "minecraft:location",
+      "conditions": {
+        "player": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "location": {
+                "structure": "fisherman_house:harbour_pier"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "lighthouse": {
+      "trigger": "minecraft:location",
+      "conditions": {
+        "player": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "location": {
+                "structure": "fisherman_house:lighthouse"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "stilt_shack": {
+      "trigger": "minecraft:location",
+      "conditions": {
+        "player": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "location": {
+                "structure": "fisherman_house:stilt_shack"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "ice_fishing_camp": {
+      "trigger": "minecraft:location",
+      "conditions": {
+        "player": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "location": {
+                "structure": "fisherman_house:ice_fishing_camp"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "river_boathouse": {
+      "trigger": "minecraft:location",
+      "conditions": {
+        "player": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "location": {
+                "structure": "fisherman_house:river_boathouse"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "sunken_trawler": {
+      "trigger": "minecraft:location",
+      "conditions": {
+        "player": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "location": {
+                "structure": "fisherman_house:sunken_trawler"
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "fisherman_house"
+    ],
+    [
+      "harbour_pier"
+    ],
+    [
+      "lighthouse"
+    ],
+    [
+      "stilt_shack"
+    ],
+    [
+      "ice_fishing_camp"
+    ],
+    [
+      "river_boathouse"
+    ],
+    [
+      "sunken_trawler"
+    ]
+  ],
+  "rewards": {
+    "experience": 250
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "parent": "fisherman_house:root",
+  "display": {
+    "icon": {
+      "id": "minecraft:heart_of_the_sea"
+    },
+    "title": {
+      "translate": "advancements.fisherman_house.discover_sunken_trawler.title",
+      "fallback": "X Marks the Wreck"
+    },
+    "description": {
+      "translate": "advancements.fisherman_house.discover_sunken_trawler.description",
+      "fallback": "Find a Sunken Trawler"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "entered": {
+      "trigger": "minecraft:location",
+      "conditions": {
+        "player": {
+          "type": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "minecraft:location": {
+              "structures": "fisherman_house:sunken_trawler"
+            }
+          }
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "entered"
+    ]
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "parent": "fisherman_house:root",
+  "display": {
+    "icon": {
+      "id": "minecraft:mangrove_roots"
+    },
+    "title": {
+      "translate": "advancements.fisherman_house.discover_stilt_shack.title",
+      "fallback": "Bayou Living"
+    },
+    "description": {
+      "translate": "advancements.fisherman_house.discover_stilt_shack.description",
+      "fallback": "Find a Stilt Shack in the swamp"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "entered": {
+      "trigger": "minecraft:location",
+      "conditions": {
+        "player": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "location": {
+                "structures": "fisherman_house:stilt_shack"
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "entered"
+    ]
+  ]
+}

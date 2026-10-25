@@ -1,0 +1,120 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "facing": "north"
+      },
+      "apply": {
+        "model": "fisherman_house:block/crab_pot",
+        "y": 0
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "baited": "true"
+      },
+      "apply": {
+        "model": "fisherman_house:block/crab_pot_bait",
+        "y": 0
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "caught": "true"
+      },
+      "apply": {
+        "model": "fisherman_house:block/crab_pot_catch",
+        "y": 0
+      }
+    },
+    {
+      "when": {
+        "facing": "east"
+      },
+      "apply": {
+        "model": "fisherman_house:block/crab_pot",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "baited": "true"
+      },
+      "apply": {
+        "model": "fisherman_house:block/crab_pot_bait",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "caught": "true"
+      },
+      "apply": {
+        "model": "fisherman_house:block/crab_pot_catch",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "south"
+      },
+      "apply": {
+        "model": "fisherman_house:block/crab_pot",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "baited": "true"
+      },
+      "apply": {
+        "model": "fisherman_house:block/crab_pot_bait",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "caught": "true"
+      },
+      "apply": {
+        "model": "fisherman_house:block/crab_pot_catch",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "west"
+      },
+      "apply": {
+        "model": "fisherman_house:block/crab_pot",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "baited": "true"
+      },
+      "apply": {
+        "model": "fisherman_house:block/crab_pot_bait",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "caught": "true"
+      },
+      "apply": {
+        "model": "fisherman_house:block/crab_pot_catch",
+        "y": 270
+      }
+    }
+  ]
+}

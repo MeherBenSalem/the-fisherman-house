@@ -1,0 +1,58 @@
+{
+  "type": "fisherman_house:coastal",
+  "biomes": "#fisherman_house:has_structure/fisherman_house",
+  "step": "surface_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "none",
+  "template": "fisherman_house:cottage",
+  "config_name": "fisherman_house",
+  "site": {
+    "mode": "land",
+    "max_slope": 2,
+    "min_depth": 2,
+    "max_above_sea": 3,
+    "y_offset": -12
+  },
+  "anchor": [
+    4,
+    13
+  ],
+  "dry": [
+    [
+      2,
+      11
+    ],
+    [
+      6,
+      11
+    ],
+    [
+      2,
+      15
+    ],
+    [
+      6,
+      15
+    ]
+  ],
+  "wet": [
+    [
+      20,
+      13
+    ],
+    [
+      32,
+      13
+    ],
+    [
+      30,
+      22
+    ],
+    [
+      15,
+      4
+    ]
+  ],
+  "around": [],
+  "search": 2
+}

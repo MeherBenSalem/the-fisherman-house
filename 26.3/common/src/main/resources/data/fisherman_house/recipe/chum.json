@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "#fisherman_house:raw_fish",
+    "minecraft:rotten_flesh",
+    "minecraft:bone_meal"
+  ],
+  "result": {
+    "id": "fisherman_house:chum",
+    "count": 4
+  }
+}

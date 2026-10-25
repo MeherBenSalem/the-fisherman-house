@@ -1,0 +1,40 @@
+{
+  "parent": "fisherman_house:root",
+  "display": {
+    "icon": {
+      "id": "minecraft:packed_ice"
+    },
+    "title": {
+      "translate": "advancements.fisherman_house.discover_ice_fishing_camp.title",
+      "fallback": "Cold Feet"
+    },
+    "description": {
+      "translate": "advancements.fisherman_house.discover_ice_fishing_camp.description",
+      "fallback": "Find an Ice Fishing Camp"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "entered": {
+      "trigger": "minecraft:location",
+      "conditions": {
+        "player": {
+          "type": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "minecraft:location": {
+              "structures": "fisherman_house:ice_fishing_camp"
+            }
+          }
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "entered"
+    ]
+  ]
+}

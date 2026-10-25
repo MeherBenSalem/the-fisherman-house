@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "T T",
+    " T ",
+    "T T"
+  ],
+  "key": {
+    "T": {
+      "item": "minecraft:string"
+    }
+  },
+  "result": {
+    "id": "fisherman_house:fishing_net",
+    "count": 4
+  }
+}

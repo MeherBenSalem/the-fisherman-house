@@ -1,0 +1,40 @@
+{
+  "parent": "fisherman_house:root",
+  "display": {
+    "icon": {
+      "id": "minecraft:bell"
+    },
+    "title": {
+      "translate": "advancements.fisherman_house.discover_harbour_pier.title",
+      "fallback": "Land Ahoy"
+    },
+    "description": {
+      "translate": "advancements.fisherman_house.discover_harbour_pier.description",
+      "fallback": "Walk out on a Harbour Pier"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "entered": {
+      "trigger": "minecraft:location",
+      "conditions": {
+        "player": {
+          "type": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "minecraft:location": {
+              "structures": "fisherman_house:harbour_pier"
+            }
+          }
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "entered"
+    ]
+  ]
+}

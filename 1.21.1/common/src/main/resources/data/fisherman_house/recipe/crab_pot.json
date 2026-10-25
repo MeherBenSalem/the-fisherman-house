@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "STS",
+    "N N",
+    "SSS"
+  ],
+  "key": {
+    "S": {
+      "item": "minecraft:stick"
+    },
+    "T": {
+      "item": "minecraft:string"
+    },
+    "N": {
+      "item": "fisherman_house:fishing_net"
+    }
+  },
+  "result": {
+    "id": "fisherman_house:crab_pot",
+    "count": 1
+  }
+}

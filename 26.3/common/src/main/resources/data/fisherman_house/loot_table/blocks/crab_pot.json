@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:block",
+  "random_sequence": "fisherman_house:blocks/crab_pot",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "fisherman_house:crab_pot"
+        }
+      ],
+      "condition": {
+        "type": "minecraft:survives_explosion"
+      }
+    }
+  ]
+}

@@ -1,0 +1,96 @@
+{
+  "type": "fisherman_house:coastal",
+  "biomes": "#fisherman_house:has_structure/river_boathouse",
+  "step": "surface_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "none",
+  "template": "fisherman_house:river_boathouse",
+  "config_name": "river_boathouse",
+  "site": {
+    "mode": "land",
+    "max_slope": 2,
+    "min_depth": 2,
+    "max_above_sea": 3,
+    "y_offset": -7,
+    "max_rise": 6
+  },
+  "anchor": [
+    4,
+    4
+  ],
+  "dry": [
+    [
+      1,
+      1
+    ],
+    [
+      7,
+      1
+    ],
+    [
+      1,
+      7
+    ],
+    [
+      7,
+      7
+    ],
+    [
+      4,
+      4
+    ]
+  ],
+  "wet": [
+    [
+      4,
+      12
+    ],
+    [
+      4,
+      16
+    ],
+    [
+      3,
+      18
+    ],
+    [
+      5,
+      18
+    ]
+  ],
+  "around": [
+    [
+      14,
+      4
+    ],
+    [
+      11,
+      11
+    ],
+    [
+      4,
+      14
+    ],
+    [
+      -3,
+      11
+    ],
+    [
+      -6,
+      4
+    ],
+    [
+      -3,
+      -3
+    ],
+    [
+      4,
+      -6
+    ],
+    [
+      11,
+      -3
+    ]
+  ],
+  "search": 2
+}

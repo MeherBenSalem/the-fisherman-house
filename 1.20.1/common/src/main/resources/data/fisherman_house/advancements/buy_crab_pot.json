@@ -1,0 +1,36 @@
+{
+  "parent": "fisherman_house:get_crab_pot",
+  "display": {
+    "icon": {
+      "item": "minecraft:emerald"
+    },
+    "title": {
+      "translate": "advancements.fisherman_house.buy_crab_pot.title",
+      "fallback": "Tools of the Trade"
+    },
+    "description": {
+      "translate": "advancements.fisherman_house.buy_crab_pot.description",
+      "fallback": "Buy a Crab Pot from a resident fisherman"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "bought": {
+      "trigger": "minecraft:villager_trade",
+      "conditions": {
+        "item": {
+          "items": [
+            "fisherman_house:crab_pot"
+          ]
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "bought"
+    ]
+  ]
+}

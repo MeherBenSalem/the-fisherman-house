@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:wheat_seeds",
+    "minecraft:rotten_flesh"
+  ],
+  "result": {
+    "id": "fisherman_house:fish_bait",
+    "count": 4
+  }
+}

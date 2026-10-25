@@ -1,0 +1,52 @@
+{
+  "type": "fisherman_house:coastal",
+  "biomes": "#fisherman_house:has_structure/sunken_trawler",
+  "step": "surface_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "none",
+  "template": "fisherman_house:sunken_trawler",
+  "config_name": "sunken_trawler",
+  "site": {
+    "mode": "seafloor",
+    "max_slope": 4,
+    "min_depth": 12,
+    "y_offset": -1
+  },
+  "anchor": [
+    6,
+    13
+  ],
+  "dry": [],
+  "wet": [
+    [
+      6,
+      3
+    ],
+    [
+      6,
+      14
+    ],
+    [
+      6,
+      24
+    ],
+    [
+      3,
+      9
+    ],
+    [
+      9,
+      18
+    ],
+    [
+      1,
+      21
+    ],
+    [
+      11,
+      6
+    ]
+  ],
+  "around": [],
+  "search": 1
+}

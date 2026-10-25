@@ -1,0 +1,10 @@
+{
+  "type": "fisherman_house:add_table",
+  "conditions": [
+    {
+      "condition": "forge:loot_table_id",
+      "loot_table_id": "minecraft:gameplay/fishing"
+    }
+  ],
+  "table": "fisherman_house:gameplay/rod_extras"
+}

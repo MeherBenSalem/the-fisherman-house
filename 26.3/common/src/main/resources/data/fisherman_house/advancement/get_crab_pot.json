@@ -1,0 +1,36 @@
+{
+  "parent": "fisherman_house:root",
+  "display": {
+    "icon": {
+      "id": "fisherman_house:crab_pot"
+    },
+    "title": {
+      "translate": "advancements.fisherman_house.get_crab_pot.title",
+      "fallback": "Pot Luck"
+    },
+    "description": {
+      "translate": "advancements.fisherman_house.get_crab_pot.description",
+      "fallback": "Get a Crab Pot"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "pot": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "fisherman_house:crab_pot"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "pot"
+    ]
+  ]
+}

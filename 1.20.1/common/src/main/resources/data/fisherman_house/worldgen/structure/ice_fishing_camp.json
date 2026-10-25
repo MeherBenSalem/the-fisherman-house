@@ -1,0 +1,52 @@
+{
+  "type": "fisherman_house:coastal",
+  "biomes": "#fisherman_house:has_structure/ice_fishing_camp",
+  "step": "surface_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "none",
+  "template": "fisherman_house:ice_fishing_camp",
+  "config_name": "ice_fishing_camp",
+  "site": {
+    "mode": "water",
+    "max_slope": 0,
+    "min_depth": 3,
+    "y_offset": -3
+  },
+  "anchor": [
+    7,
+    6
+  ],
+  "dry": [],
+  "wet": [
+    [
+      7,
+      6
+    ],
+    [
+      1,
+      6
+    ],
+    [
+      13,
+      6
+    ],
+    [
+      7,
+      0
+    ],
+    [
+      7,
+      12
+    ],
+    [
+      3,
+      2
+    ],
+    [
+      11,
+      10
+    ]
+  ],
+  "around": [],
+  "search": 1
+}

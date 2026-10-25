@@ -1,0 +1,62 @@
+{
+  "type": "fisherman_house:coastal",
+  "biomes": "#fisherman_house:has_structure/harbour_pier",
+  "step": "surface_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "none",
+  "template": "fisherman_house:harbour_pier",
+  "config_name": "harbour_pier",
+  "site": {
+    "mode": "land",
+    "max_slope": 2,
+    "min_depth": 3,
+    "max_above_sea": 3,
+    "y_offset": -13
+  },
+  "anchor": [
+    6,
+    6
+  ],
+  "dry": [
+    [
+      1,
+      2
+    ],
+    [
+      11,
+      2
+    ],
+    [
+      1,
+      10
+    ],
+    [
+      11,
+      10
+    ],
+    [
+      6,
+      6
+    ]
+  ],
+  "wet": [
+    [
+      6,
+      36
+    ],
+    [
+      2,
+      37
+    ],
+    [
+      10,
+      37
+    ],
+    [
+      6,
+      24
+    ]
+  ],
+  "around": [],
+  "search": 2
+}
