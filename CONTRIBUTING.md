@@ -39,7 +39,9 @@ python3 tools/datagen.py        # everything under */common/src/main/resources/{
 newer version upgrades it with its own data fixers, so one file serves all builds. Each template records where it
 samples the land (`site(...)`: dry points for its land part, wet points for its dock or hull, and the rules) and
 `tools/datagen.py` writes those into the structure JSON. The Fisherman's Cottage is the 1.x house, repaired by the same
-script from `tools/assets/legacy/fisherman_house_1.1.nbt`.
+script from `tools/assets/legacy/fisherman_house_1.1.nbt`; the 1.x template itself is also written, with only its
+paintings' and item frames' anchor blocks corrected, and stays at the id `fisherman_house:fisherman_house` for houses
+1.x left half-generated.
 
 `tools/datagen.py` knows each version's format (folder names, ingredient and result syntax, loot conditions and
 functions, item model definitions, pack formats, loot modifiers); change the tables at its top and run it, then
