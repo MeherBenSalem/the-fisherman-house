@@ -14,8 +14,11 @@ java {
 }
 
 tasks.withType(Jar).configureEach {
-    from(rootProject.file('LICENSE')) {
-        rename { "${it}_${mod_name}" }
+    from(rootProject.file('../LICENSE')) {
+        rename { "${it}_${mod_id}" }
+    }
+    from(rootProject.file('../NOTICE')) {
+        rename { "${it}_${mod_id}" }
     }
 }
 

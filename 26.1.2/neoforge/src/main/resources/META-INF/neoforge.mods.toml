@@ -1,12 +1,16 @@
 modLoader = "javafml"
 loaderVersion = "${neoforge_loader_version_range}"
 license = "${license}"
+issueTrackerURL = "https://github.com/MeherBenSalem/the-fisherman-house/issues"
 
 [[mods]]
 modId = "${mod_id}"
 version = "${version}"
 displayName = "${mod_name}"
 displayURL = "https://github.com/MeherBenSalem/the-fisherman-house"
+# logoFile for older NeoForge versions, iconFile (the logo is square) for current ones
+logoFile = "logo.png"
+iconFile = "logo.png"
 credits = "${credits}"
 authors = "${mod_author}"
 description = '''${description}'''

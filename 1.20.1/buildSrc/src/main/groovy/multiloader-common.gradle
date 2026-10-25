@@ -13,6 +13,14 @@ java {
     withJavadocJar()
 }
 
+// Java 17 still reads sources in the platform charset (US-ASCII on a POSIX locale); the sources and resources are UTF-8.
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+tasks.withType(Javadoc).configureEach {
+    options.encoding = 'UTF-8'
+}
+
 repositories {
     mavenCentral()
     // https://docs.gradle.org/current/userguide/declaring_repositories.html#declaring_content_exclusively_found_in_one_repository
@@ -59,14 +67,20 @@ repositories {
 }
 
 sourcesJar {
-    from(rootProject.file('LICENSE')) {
-        rename { "${it}_${mod_name}" }
+    from(rootProject.file('../LICENSE')) {
+        rename { "${it}_${mod_id}" }
+    }
+    from(rootProject.file('../NOTICE')) {
+        rename { "${it}_${mod_id}" }
     }
 }
 
 jar {
-    from(rootProject.file('LICENSE')) {
-        rename { "${it}_${mod_name}" }
+    from(rootProject.file('../LICENSE')) {
+        rename { "${it}_${mod_id}" }
+    }
+    from(rootProject.file('../NOTICE')) {
+        rename { "${it}_${mod_id}" }
     }
 
     manifest {
@@ -83,6 +97,7 @@ jar {
 }
 
 processResources {
+    filteringCharset = 'UTF-8'
     var expandProps = [
             'version'                      : version,
             'group'                        : project.group, //Else we target the task's group.
@@ -95,8 +110,8 @@ processResources {
             'mod_id'                       : mod_id,
             'license'                      : license,
             'description'                  : project.description,
-            "forge_version": forge_version,
-            "forge_loader_version_range": forge_loader_version_range,
+            'forge_version'                : forge_version,
+            'forge_loader_version_range'   : forge_loader_version_range,
             'credits'                      : credits,
             'java_version'                 : java_version
     ]

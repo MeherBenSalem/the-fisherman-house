@@ -12,6 +12,12 @@ neoForge {
     }
 }
 
+dependencies {
+    compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
+    // fabric and neoforge both bundle mixinextras, so it is safe to use it in common
+    compileOnly group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.5.3'
+    annotationProcessor group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.5.3'
+}
 
 configurations {
     commonJava {
@@ -32,7 +38,7 @@ artifacts {
 // Implement mcgradleconventions loader attribute
 def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)
 ['apiElements', 'runtimeElements', 'sourcesElements', 'javadocElements'].each { variant ->
-    configurations.named(variant) {
+    configurations.named("$variant") {
         attributes {
             attribute(loaderAttribute, 'common')
         }
@@ -40,10 +46,25 @@ def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', Strin
 }
 sourceSets.configureEach {
     [it.compileClasspathConfigurationName, it.runtimeClasspathConfigurationName].each { variant->
-        configurations.named(variant) {
+        configurations.named("$variant") {
             attributes {
                 attribute(loaderAttribute, 'common')
             }
         }
     }
+}
+
+// Plain unit tests for the Minecraft-free logic (tier odds, config files).
+dependencies {
+    testImplementation(platform('org.junit:junit-bom:5.11.4'))
+    testImplementation('org.junit.jupiter:junit-jupiter')
+    testRuntimeOnly('org.junit.platform:junit-platform-launcher')
+}
+
+// The tests see the same Minecraft/Gson classpath as the main code.
+sourceSets.test.compileClasspath += sourceSets.main.compileClasspath
+sourceSets.test.runtimeClasspath += sourceSets.main.compileClasspath
+
+tasks.named('test', Test) {
+    useJUnitPlatform()
 }

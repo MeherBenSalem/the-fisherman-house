@@ -1,27 +1,32 @@
 {
-  "schemaVersion": 1,
-  "id": "${mod_id}",
-  "version": "${version}",
-  "name": "${mod_name}",
-  "description": "${description}",
-  "authors": [
-    "${mod_author}"
-  ],
-  "contact": {
-    "homepage": "https://github.com/MeherBenSalem/the-fisherman-house",
-    "sources": "https://github.com/MeherBenSalem/the-fisherman-house"
-  },
-  "license": "${license}",
-  "environment": "*",
-  "entrypoints": {
-    "main": [
-      "tn.nightbeam.fishermanhouse.FishermanHouseMod"
-    ]
-  },
-  "depends": {
-    "fabricloader": ">=${fabric_loader_version}",
-    "fabric-api": "*",
-    "minecraft": "${minecraft_version}",
-    "java": ">=${java_version}"
-  }
+    "schemaVersion": 1,
+    "id": "${mod_id}",
+    "version": "${version}",
+    "name": "${mod_name}",
+    "description": "${description}",
+    "authors": [
+        "${mod_author}"
+    ],
+    "contact": {
+        "homepage": "https://github.com/MeherBenSalem/the-fisherman-house",
+        "sources": "https://github.com/MeherBenSalem/the-fisherman-house",
+        "issues": "https://github.com/MeherBenSalem/the-fisherman-house/issues"
+    },
+    "license": "${license}",
+    "icon": "logo.png",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "tn.nightbeam.fishermanhouse.fabric.FishermanHouseFabric"
+        ],
+        "client": [
+            "tn.nightbeam.fishermanhouse.fabric.FishermanHouseFabricClient"
+        ]
+    },
+    "depends": {
+        "fabricloader": ">=${fabric_loader_version}",
+        "fabric-api": "*",
+        "minecraft": "${minecraft_version}",
+        "java": ">=${java_version}"
+    }
 }

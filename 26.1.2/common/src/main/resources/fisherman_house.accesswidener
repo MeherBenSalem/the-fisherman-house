@@ -1,0 +1,5 @@
+accessWidener v2 official
+
+# 26.1.2 keeps the BlockEntityType constructor private (public from 26.2 on).
+accessible class net/minecraft/world/level/block/entity/BlockEntityType$BlockEntitySupplier
+accessible method net/minecraft/world/level/block/entity/BlockEntityType <init> (Lnet/minecraft/world/level/block/entity/BlockEntityType$BlockEntitySupplier;Ljava/util/Set;)V

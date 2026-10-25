@@ -8,17 +8,18 @@ legacyForge {
 
     validateAccessTransformers = true
 
-    def at = project(':common').file('src/main/resources/META-INF/accesstransformer.cfg')
-    if (at.exists()) {
-        accessTransformers = ["src/main/resources/META-INF/accesstransformer.cfg"]
-    }
+    // common's access transformer only opens what Forge's own already opens, so it is not applied here
     parchment {
         minecraftVersion = parchment_minecraft
         mappingsVersion = parchment_version
     }
     runs {
+        configureEach {
+            ideName = "Forge ${it.name.capitalize()} (${project.path})" // Unify the run config names with fabric
+        }
         client {
             client()
+            gameDirectory = project.file('runs/client')
         }
         data {
             data()
@@ -26,6 +27,13 @@ legacyForge {
         }
         server {
             server()
+            gameDirectory = project.file('runs/server')
+        }
+        // QA client: joins a server on localhost:25565 straight away (see tools/qa/).
+        qaClient {
+            client()
+            gameDirectory = project.file('runs/client')
+            programArguments.addAll '--quickPlayMultiplayer', 'localhost:25565', '--username', 'Builder', '--width', '1920', '--height', '1080'
         }
     }
 
@@ -39,10 +47,10 @@ legacyForge {
 sourceSets.main.resources.srcDir 'src/generated/resources'
 
 dependencies {
-    compileOnly project(":common")
+    // @Nullable in the common code; Forge's userdev does not bring it (the common project gets it from mcp_config).
+    compileOnly 'org.jetbrains:annotations:24.0.1'
 }
 
 jar {
     finalizedBy('reobfJar')
-    
 }

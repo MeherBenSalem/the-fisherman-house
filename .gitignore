@@ -35,3 +35,9 @@ Thumbs.db
 *.pem
 *.jks
 credentials.json
+
+# QA scratch output
+marketing/images/explore/
+marketing/source/.render-*.html
+tools/**/__pycache__/
+**/logs/
