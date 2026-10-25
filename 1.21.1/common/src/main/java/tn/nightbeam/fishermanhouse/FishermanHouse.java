@@ -1,8 +1,24 @@
 package tn.nightbeam.fishermanhouse;
 
-public class FishermanHouse {
+import net.minecraft.resources.ResourceLocation;
+import tn.nightbeam.fishermanhouse.content.ModContent;
+import tn.nightbeam.fishermanhouse.core.CoastConfig;
+import tn.nightbeam.fishermanhouse.platform.Platform;
+import tn.nightbeam.fishermanhouse.platform.Registrar;
 
-    public static void init() {
-        Constants.LOG.info("Initializing The Fisherman House");
+/** Common entry point, called by each loader's mod class. */
+public final class FishermanHouse {
+    private FishermanHouse() {
+    }
+
+    public static void init(Platform platform, Registrar registrar) {
+        CoastConfig.load(platform.configDir());
+        ModContent.register(registrar);
+        Constants.LOG.info("{} ready: {} structures enabled", Constants.MOD_NAME,
+                CoastConfig.STRUCTURES.stream().filter(CoastConfig.get()::structureEnabled).count());
+    }
+
+    public static ResourceLocation id(String path) {
+        return ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, path);
     }
 }
