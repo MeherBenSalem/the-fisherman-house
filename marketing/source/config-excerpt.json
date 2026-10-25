@@ -1,0 +1,25 @@
+// Fisherman's Coast. Changes apply after a restart.
+// Biomes, spacing and loot are datapack data: see the README.
+{
+  // Crab Pots catch something every min_seconds to max_seconds (random in between) when
+  // unbaited; bait shortens the wait. min_water: water blocks needed in the 5x3x5 box around the pot
+  // (74 at most). rain_bonus: twice as fast while it rains on the pot.
+  "crab_pot": {
+    "min_seconds": 60,
+    "max_seconds": 120,
+    "min_water": 20,
+    "rain_bonus": true
+  },
+
+  // Set a structure to false to stop it generating in new chunks (ones already
+  // generated stay).
+  "structures": {
+    "fisherman_house": true,
+    "harbour_pier": true,
+    "lighthouse": true,
+    "stilt_shack": true,
+    "ice_fishing_camp": true,
+    "river_boathouse": true,
+    "sunken_trawler": true
+  }
+}
