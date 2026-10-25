@@ -1,0 +1,66 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  datagen:
+    # The generated assets and data in every workspace must match tools/ (datagen, structures, textures).
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Regenerate and compare
+        run: |
+          pip install nbtlib==2.0.4 Pillow==12.3.0
+          python3 tools/gen_textures.py
+          python3 tools/structures.py
+          python3 tools/datagen.py
+          git diff --stat --exit-code
+
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - folder: "1.20.1"
+            java: "17"
+          - folder: "1.21.1"
+            java: "21"
+          - folder: "26.1.2"
+            java: "25"
+          - folder: "26.2"
+            java: "25"
+          - folder: "26.3"
+            java: "25"
+    defaults:
+      run:
+        working-directory: ${{ matrix.folder }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Build
+        run: |
+          chmod +x gradlew
+          ./gradlew build --no-daemon

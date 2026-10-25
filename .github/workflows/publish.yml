@@ -1,0 +1,297 @@
+# Publishes the release jars in releases/ to Modrinth and CurseForge.
+#
+# Jars are never built here: the jars in releases/ are the ones that went through in-game QA (docs/QA-<version>.md).
+# They are named fisherman_house-{loader}-{minecraft}-{version}.jar; the loader and Minecraft version are read from the
+# name and checked against the metadata inside each jar.
+#
+# Secrets:   MODRINTH_TOKEN, CURSEFORGE_TOKEN, CURSEFORGE_API_KEY
+# Variables: MODRINTH_ID, CURSEFORGE_ID
+#
+# Run it from the Actions tab (workflow_dispatch) or push a tag: git tag v2.0.0 && git push origin v2.0.0
+# Re-running is safe: versions that already exist on a platform are skipped.
+
+name: Publish
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to publish, without v (default: the version in the workspaces' gradle.properties)"
+        required: false
+      dry_run:
+        description: "Check everything but upload nothing"
+        type: boolean
+        default: false
+      platforms:
+        description: "Where to upload"
+        type: choice
+        options: [both, modrinth, curseforge]
+        default: both
+      minecraft_version:
+        description: "Only upload the jars for this Minecraft version (e.g. 26.2); empty for all"
+        required: false
+      update_listing:
+        description: "Also update the Modrinth description, summary and icon from marketing/"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      # Every build this repository ships; a release must contain all of them.
+      EXPECTED_BUILDS: >-
+        fabric:1.20.1 forge:1.20.1 fabric:1.21.1 neoforge:1.21.1 fabric:26.1.2 neoforge:26.1.2
+        fabric:26.2 neoforge:26.2 fabric:26.3 neoforge:26.3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Test the jar name parser
+        run: node .github/scripts/detect-jar-meta.test.js
+
+      - name: Resolve and check the version
+        id: ver
+        shell: bash
+        env:
+          REF: ${{ github.ref }}
+          REF_NAME: ${{ github.ref_name }}
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          declared=$(grep -h '^version=' */gradle.properties | cut -d= -f2 | sort -u)
+          if [ "$(printf '%s\n' "$declared" | wc -l)" -ne 1 ]; then
+            echo "The workspaces declare different versions: $declared" >&2; exit 1
+          fi
+          if [[ "$REF" == refs/tags/v* ]]; then
+            version="${REF_NAME#v}"
+          elif [ -n "$INPUT_VERSION" ]; then
+            version="$INPUT_VERSION"
+          else
+            version="$declared"
+          fi
+          if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Not a release version: '$version'" >&2; exit 1
+          fi
+          if [ "$version" != "$declared" ]; then
+            echo "Version $version does not match gradle.properties ($declared)" >&2; exit 1
+          fi
+          if [ ! -f "patchnotes/$version.md" ]; then
+            echo "Missing patchnotes/$version.md" >&2; exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Find and verify the release jars
+        id: jars
+        shell: bash
+        env:
+          VERSION: ${{ steps.ver.outputs.version }}
+          MC_FILTER: ${{ inputs.minecraft_version }}
+        run: |
+          set -euo pipefail
+          if [ -n "$MC_FILTER" ] && ! [[ "$MC_FILTER" =~ ^[0-9]+(\.[0-9]+){1,2}$ ]]; then
+            echo "Not a Minecraft version: '$MC_FILTER'" >&2; exit 1
+          fi
+          list=$(mktemp)
+          for build in $EXPECTED_BUILDS; do
+            loader=${build%%:*}; mc=${build##*:}
+            if [ -n "$MC_FILTER" ] && [ "$mc" != "$MC_FILTER" ]; then continue; fi
+            jar="releases/fisherman_house-$loader-$mc-$VERSION.jar"
+            if [ ! -f "$jar" ]; then echo "Missing $jar" >&2; exit 1; fi
+            meta=$(node .github/scripts/detect-jar-meta.js "$jar")
+            [ "$meta" = "{\"loader\":\"$loader\",\"gv\":\"$mc\"}" ] || { echo "$jar parsed as $meta" >&2; exit 1; }
+            # The jar's own metadata must name the mod and this version.
+            case $loader in
+              fabric) inner=$(unzip -p "$jar" fabric.mod.json) ;;
+              forge) inner=$(unzip -p "$jar" META-INF/mods.toml) ;;
+              neoforge) inner=$(unzip -p "$jar" META-INF/neoforge.mods.toml) ;;
+            esac
+            grep -q 'fisherman_house' <<<"$inner" || { echo "$jar: mod id missing from its metadata" >&2; exit 1; }
+            grep -q "$VERSION" <<<"$inner" || { echo "$jar: version $VERSION missing from its metadata" >&2; exit 1; }
+            echo "$jar" >> "$list"
+          done
+          if [ ! -s "$list" ]; then echo "No jars selected" >&2; exit 1; fi
+          cat "$list"
+          cp "$list" jar-list.txt
+
+      - name: Upload to Modrinth and CurseForge
+        if: ${{ !inputs.dry_run }}
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+          CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
+          MODRINTH_ID: ${{ vars.MODRINTH_ID }}
+          CURSEFORGE_ID: ${{ vars.CURSEFORGE_ID }}
+          VERSION: ${{ steps.ver.outputs.version }}
+          PLATFORMS: ${{ inputs.platforms || 'both' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const { detectRequired, LOADER_IDS } = require('./.github/scripts/detect-jar-meta.js');
+          const env = process.env;
+          const version = env.VERSION;
+          const platforms = env.PLATFORMS;
+          const doModrinth = platforms === 'both' || platforms === 'modrinth';
+          const doCurse = platforms === 'both' || platforms === 'curseforge';
+          const jars = fs.readFileSync('jar-list.txt', 'utf8').split('\n').map((s) => s.trim()).filter(Boolean);
+          const changelog = fs.readFileSync(path.join('patchnotes', `${version}.md`), 'utf8');
+          for (const [key, needed] of [['MODRINTH_TOKEN', doModrinth], ['MODRINTH_ID', doModrinth],
+              ['CURSEFORGE_TOKEN', doCurse], ['CURSEFORGE_API_KEY', doCurse], ['CURSEFORGE_ID', doCurse]]) {
+            if (needed && !env[key]) throw new Error(`${key} is not set`);
+          }
+
+          // fetch with retries on rate limits and server errors.
+          async function request(url, options, label) {
+            for (let attempt = 1; ; attempt++) {
+              const res = await fetch(url, options);
+              if (res.ok || attempt >= 4 || !(res.status === 429 || res.status >= 500)) {
+                const text = await res.text();
+                if (!res.ok) throw new Error(`${label}: ${res.status} ${text.slice(0, 500)}`);
+                return text;
+              }
+              const wait = 5000 * attempt;
+              console.warn(`${label}: ${res.status}, retrying in ${wait / 1000}s`);
+              await new Promise((r) => setTimeout(r, wait));
+            }
+          }
+
+          async function modrinth() {
+            const headers = { Authorization: env.MODRINTH_TOKEN };
+            const existing = JSON.parse(await request(`https://api.modrinth.com/v2/project/${env.MODRINTH_ID}/version`,
+              { headers }, 'Modrinth versions')).map((v) => v.version_number);
+            for (const jar of jars) {
+              const { loader, gv } = detectRequired(jar);
+              const number = `${version}+${loader}-${gv}`;
+              if (existing.includes(number)) {
+                console.log('Modrinth: already there, skipped', number);
+                continue;
+              }
+              const body = {
+                name: `${version} ${loader} ${gv}`,
+                version_number: number,
+                changelog,
+                // Fabric jars need Fabric API (Modrinth project P7dR8mSH).
+                dependencies: loader === 'fabric' ? [{ project_id: 'P7dR8mSH', dependency_type: 'required' }] : [],
+                game_versions: [gv],
+                version_type: 'release',
+                loaders: [loader],
+                featured: false,
+                status: 'listed',
+                project_id: env.MODRINTH_ID,
+                file_parts: ['file_0'],
+                primary_file: 'file_0',
+              };
+              const form = new FormData();
+              form.append('data', JSON.stringify(body));
+              form.append('file_0', new Blob([fs.readFileSync(jar)]), path.basename(jar));
+              await request('https://api.modrinth.com/v2/version', { method: 'POST', headers, body: form }, `Modrinth ${number}`);
+              console.log('Modrinth OK', path.basename(jar));
+            }
+          }
+
+          function flattenVersions(payload) {
+            const flat = [];
+            const data = payload?.data ?? payload;
+            if (!Array.isArray(data)) return flat;
+            for (const entry of data) {
+              if (Array.isArray(entry?.versions)) flat.push(...entry.versions);
+              else if (entry && entry.id != null && entry.name) flat.push(entry);
+            }
+            return flat;
+          }
+
+          function versionId(flat, name) {
+            const match = flat.find((v) => v.name === name || v.slug === name)
+              ?? flat.find((v) => String(v.name).toLowerCase() === String(name).toLowerCase());
+            return match?.id;
+          }
+
+          async function curseforge() {
+            const flat = flattenVersions(JSON.parse(await request('https://minecraft.curseforge.com/api/game/versions',
+              { headers: { 'X-Api-Token': env.CURSEFORGE_TOKEN } }, 'CurseForge game versions')));
+            if (!flat.length) throw new Error('No CurseForge game versions resolved');
+            const files = JSON.parse(await request(`https://api.curseforge.com/v1/mods/${env.CURSEFORGE_ID}/files?pageSize=50`,
+              { headers: { 'x-api-key': env.CURSEFORGE_API_KEY } }, 'CurseForge files'));
+            const existing = (files.data || []).map((f) => f.displayName || f.fileName);
+            for (const jar of jars) {
+              const name = path.basename(jar);
+              if (existing.includes(name)) {
+                console.log('CurseForge: already there, skipped', name);
+                continue;
+              }
+              const { loader, gv } = detectRequired(jar);
+              const ids = [versionId(flat, gv), LOADER_IDS[loader], versionId(flat, 'Client'), versionId(flat, 'Server')];
+              if (ids[0] == null) throw new Error(`No CurseForge game version for ${gv}`);
+              const meta = {
+                changelog,
+                changelogType: 'markdown',
+                displayName: name,
+                gameVersions: ids.filter((id) => id != null),
+                releaseType: 'release',
+              };
+              if (loader === 'fabric') meta.relations = { projects: [{ slug: 'fabric-api', type: 'requiredDependency' }] };
+              const form = new FormData();
+              form.append('metadata', JSON.stringify(meta));
+              form.append('file', new Blob([fs.readFileSync(jar)]), name);
+              await request(`https://minecraft.curseforge.com/api/projects/${env.CURSEFORGE_ID}/upload-file`,
+                { method: 'POST', headers: { 'X-Api-Token': env.CURSEFORGE_TOKEN }, body: form }, `CurseForge ${name}`);
+              console.log('CurseForge OK', name);
+            }
+          }
+
+          (async () => {
+            if (doModrinth) await modrinth();
+            if (doCurse) await curseforge();
+          })().catch((e) => { console.error(e.message || e); process.exit(1); });
+          NODE
+
+      # CurseForge has no API for the project description: paste marketing/curseforge/description.md there by hand.
+      - name: Update the Modrinth listing
+        if: ${{ inputs.update_listing && !inputs.dry_run }}
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          MODRINTH_ID: ${{ vars.MODRINTH_ID }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+          (async () => {
+            const headers = { Authorization: process.env.MODRINTH_TOKEN };
+            const project = `https://api.modrinth.com/v2/project/${process.env.MODRINTH_ID}`;
+            const body = fs.readFileSync('marketing/curseforge/description.md', 'utf8');
+            const description = fs.readFileSync('marketing/curseforge/summary.txt', 'utf8').trim();
+            const res = await fetch(project, {
+              method: 'PATCH',
+              headers: { ...headers, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ body, description }),
+            });
+            if (!res.ok) throw new Error('Modrinth listing ' + res.status + ' ' + (await res.text()).slice(0, 300));
+            const icon = await fetch(`${project}/icon?ext=png`, {
+              method: 'PATCH',
+              headers: { ...headers, 'Content-Type': 'image/png' },
+              body: fs.readFileSync('marketing/images/icon.png'),
+            });
+            if (!icon.ok) throw new Error('Modrinth icon ' + icon.status + ' ' + (await icon.text()).slice(0, 300));
+            console.log('Modrinth description, summary and icon updated');
+          })().catch((e) => { console.error(e); process.exit(1); });
+          NODE

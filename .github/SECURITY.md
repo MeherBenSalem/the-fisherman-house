@@ -2,7 +2,7 @@
 
 ## Supported versions
 
-Security fixes are targeted at the latest release of each actively maintained Minecraft version tree in this repository (`1.20.1`, `1.21.1`, `26.1.2`, `26.2`).
+Security fixes are targeted at the latest release of each actively maintained Minecraft version tree in this repository (`1.20.1`, `1.21.1`, `26.1.2`, `26.2`, `26.3`).
 
 ## Reporting a vulnerability
 

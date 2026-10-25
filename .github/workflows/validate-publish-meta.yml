@@ -1,0 +1,43 @@
+# Validate jar→Minecraft version detection used by the publish workflow.
+# Prevents calendar Minecraft versions (e.g. 26.1.2) from being mis-tagged as 1.21.1.
+
+name: Validate publish metadata
+
+on:
+  push:
+    paths:
+      - '.github/scripts/**'
+      - '.github/workflows/publish.yml'
+      - '.github/workflows/validate-publish-meta.yml'
+  pull_request:
+    paths:
+      - '.github/scripts/**'
+      - '.github/workflows/publish.yml'
+      - '.github/workflows/validate-publish-meta.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  detect-jar-meta:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Run detect-jar-meta unit tests
+        run: node .github/scripts/detect-jar-meta.test.js
+      - name: Spot-check releases/ jar names (if present)
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          jars=(releases/*.jar)
+          if [ ${#jars[@]} -eq 0 ]; then
+            echo 'No releases/*.jar — skip'
+            exit 0
+          fi
+          for jar in "${jars[@]}"; do
+            echo -n "$jar -> "
+            node .github/scripts/detect-jar-meta.js "$jar"
+          done
