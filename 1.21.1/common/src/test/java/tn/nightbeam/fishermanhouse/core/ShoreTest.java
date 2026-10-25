@@ -35,6 +35,26 @@ class ShoreTest {
     }
 
     @Test
+    void wetPointsAreCheckedBeforeTheDryOnes() {
+        // A dry point that would fail on its own is never read when the water ahead is too shallow.
+        var dry = new java.util.AbstractList<Column>() {
+            @Override
+            public Column get(int index) {
+                throw new AssertionError("dry point read");
+            }
+
+            @Override
+            public int size() {
+                return 1;
+            }
+        };
+        assertTrue(Shore.baseY(PIER, dry, List.of(water(61)), List.of(), SEA).isEmpty());
+        Rules anyWet = new Rules(Mode.LAND, 2, 3, 64, 4, true, -4, 64);
+        assertTrue(Shore.baseY(anyWet, dry, List.of(water(61), dry(64)), List.of(), SEA).isEmpty());
+        assertEquals(60, Shore.baseY(anyWet, List.of(dry(64)), List.of(dry(64), water(58)), List.of(), SEA).getAsInt());
+    }
+
+    @Test
     void shallowWaterIsNotEnoughForAPier() {
         assertTrue(Shore.baseY(PIER, List.of(dry(64)), List.of(water(61)), List.of(), SEA).isEmpty());
     }

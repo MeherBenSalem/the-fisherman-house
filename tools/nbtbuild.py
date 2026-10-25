@@ -175,12 +175,14 @@ class Template:
             lx, ly, lz = x - lo[0], y - lo[1], z - lo[2]
             nbt = Compound(nbt)
             nbt['Pos'] = List[Double]([Double(lx), Double(ly), Double(lz)])
+            block = [math.floor(lx), math.floor(ly), math.floor(lz)]
             if 'TileX' in nbt:
-                nbt['TileX'] = Int(int(nbt['TileX']) - lo[0])
-                nbt['TileY'] = Int(int(nbt['TileY']) - lo[1])
-                nbt['TileZ'] = Int(int(nbt['TileZ']) - lo[2])
+                # A hanging entity's block is the one it hangs on (for a 2x2 painting, not the one at its centre), as
+                # vanilla saves it: the game places the entity by it.
+                block = [int(nbt['TileX']) - lo[0], int(nbt['TileY']) - lo[1], int(nbt['TileZ']) - lo[2]]
+                nbt['TileX'], nbt['TileY'], nbt['TileZ'] = (Int(v) for v in block)
             ents.append(Compound({'pos': List[Double]([Double(lx), Double(ly), Double(lz)]),
-                                  'blockPos': List[Int]([Int(math.floor(lx)), Int(math.floor(ly)), Int(math.floor(lz))]),
+                                  'blockPos': List[Int]([Int(v) for v in block]),
                                   'nbt': nbt}))
         root = Compound({'size': List[Int]([Int(s) for s in size]), 'palette': List[Compound](pal),
                          'blocks': List[Compound](blocks), 'entities': List[Compound](ents), 'DataVersion': Int(DATA_VERSION)})

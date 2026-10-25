@@ -2,6 +2,7 @@ package tn.nightbeam.fishermanhouse.world;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -126,18 +127,29 @@ public class CoastStructure extends Structure {
                 QuartPos.fromBlock(pos.getY()), QuartPos.fromBlock(pos.getZ()), context.randomState().sampler()));
     }
 
+    /**
+     * The columns under {@code points}, each computed only when the rules read it: the rules stop at the first column
+     * that does not fit, and a noise column is the expensive part of placement (and of /locate and bottle maps).
+     */
     private static List<Shore.Column> sample(GenerationContext context, Map<Long, Shore.Column> cache, List<List<Integer>> points,
                                              int originX, int originZ, int turns) {
-        List<Shore.Column> out = new ArrayList<>(points.size());
-        for (List<Integer> point : points) {
-            int[] p = Shore.rotate(point.get(0), point.get(1), turns);
-            int x = originX + p[0];
-            int z = originZ + p[1];
-            out.add(cache.computeIfAbsent(BlockPos.asLong(x, 0, z), key -> new Shore.Column(
-                    context.chunkGenerator().getFirstOccupiedHeight(x, z, Heightmap.Types.WORLD_SURFACE_WG, context.heightAccessor(), context.randomState()),
-                    context.chunkGenerator().getFirstOccupiedHeight(x, z, Heightmap.Types.OCEAN_FLOOR_WG, context.heightAccessor(), context.randomState()))));
-        }
-        return out;
+        return new AbstractList<>() {
+            @Override
+            public Shore.Column get(int index) {
+                List<Integer> point = points.get(index);
+                int[] p = Shore.rotate(point.get(0), point.get(1), turns);
+                int x = originX + p[0];
+                int z = originZ + p[1];
+                return cache.computeIfAbsent(BlockPos.asLong(x, 0, z), key -> new Shore.Column(
+                        context.chunkGenerator().getFirstOccupiedHeight(x, z, Heightmap.Types.WORLD_SURFACE_WG, context.heightAccessor(), context.randomState()),
+                        context.chunkGenerator().getFirstOccupiedHeight(x, z, Heightmap.Types.OCEAN_FLOOR_WG, context.heightAccessor(), context.randomState())));
+            }
+
+            @Override
+            public int size() {
+                return points.size();
+            }
+        };
     }
 
     private static com.mojang.serialization.DataResult<List<Integer>> point(List<Integer> p) {

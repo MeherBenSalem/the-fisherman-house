@@ -72,7 +72,7 @@ public final class Shore {
     }
 
     private static OptionalInt land(Rules rules, List<Column> dry, List<Column> wet, int seaLevel) {
-        if (dry.isEmpty()) {
+        if (dry.isEmpty() || !deepEnough(rules, wet)) {
             return OptionalInt.empty();
         }
         int lowest = Integer.MAX_VALUE;
@@ -103,6 +103,27 @@ public final class Shore {
             return OptionalInt.empty();
         }
         return OptionalInt.of(y + rules.yOffset());
+    }
+
+    /**
+     * The part of the wet rule that does not depend on the height: water at least {@code minDepth} deep at every wet
+     * point (at one, with {@code anyWet}). Checked before the dry points, since most candidate spots fail it and a
+     * column is expensive to sample during world generation.
+     */
+    private static boolean deepEnough(Rules rules, List<Column> wet) {
+        if (wet.isEmpty()) {
+            return true;
+        }
+        for (Column column : wet) {
+            boolean deep = column.depth() >= rules.minDepth();
+            if (deep && rules.anyWet()) {
+                return true;
+            }
+            if (!deep && !rules.anyWet()) {
+                return false;
+            }
+        }
+        return !rules.anyWet();
     }
 
     private static OptionalInt water(Rules rules, List<Column> columns) {

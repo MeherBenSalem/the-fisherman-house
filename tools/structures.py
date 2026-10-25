@@ -11,12 +11,13 @@ above the ground (it replaces the top block of the terrain). Templates are writt
 """
 from __future__ import annotations
 
+import gzip
 import json
 import math
 import random
 from pathlib import Path
 
-from nbtlib import Byte, Compound, Int, List, String, load
+from nbtlib import Byte, Compound, File, Int, List, String, load
 
 from nbtbuild import (AIR, NS, OPPOSITE, Template, door, fence, lantern, log, offer, slab, stairs, trapdoor)
 
@@ -703,6 +704,19 @@ def sunken_trawler():
 
 
 
+def legacy_house():
+    """The 1.x template, kept at its id so houses 1.x left half-generated finish the way they started. Only one thing
+    changes: its paintings and item frames recorded their block 8 below where they hang, so the game logged an error
+    and dropped the position; the block is now the one they hang on."""
+    src = load(LEGACY_HOUSE)
+    for e in src['entities']:
+        if 'TileX' in e['nbt']:
+            for axis, v in zip('XYZ', e['blockPos']):
+                e['nbt'][f'Tile{axis}'] = Int(int(v))
+    with gzip.GzipFile(OUT / 'fisherman_house.nbt', 'wb', mtime=0) as out:
+        File(src).write(out, byteorder='big')
+
+
 BUILDERS = [cottage, harbour_pier, lighthouse, stilt_shack, ice_fishing_camp, river_boathouse, sunken_trawler]
 
 
@@ -712,6 +726,7 @@ def main():
         t = build()
         size = t.save(OUT / f'{t.name}.nbt')
         print(f'{t.name}: {size[0]}x{size[1]}x{size[2]}, {len(t.blocks)} blocks, {len(t.entities)} entities')
+    legacy_house()
     (OUT / 'sites.json').write_text(json.dumps(SITES, indent=2) + '\n')
 
 
