@@ -17,13 +17,17 @@ import math
 import random
 from pathlib import Path
 
-from nbtlib import Byte, Compound, File, Int, List, String, load
+from nbtlib import Byte, Compound, File, Float, Int, List, String, load
 
 from nbtbuild import (AIR, NS, OPPOSITE, Template, door, fence, lantern, log, offer, slab, stairs, trapdoor)
 
 TOOLS = Path(__file__).resolve().parent
 OUT = TOOLS / 'assets' / 'structures'
 LEGACY_HOUSE = TOOLS / 'assets' / 'legacy' / 'fisherman_house_1.1.nbt'
+# The Cottage's paintings: the 1.x ones, each replaced by a one-block painting that exists on every version.
+PAINTINGS = {'minecraft:skull_and_roses': 'minecraft:bomb', 'minecraft:wasteland': 'minecraft:wasteland',
+             'minecraft:humble': 'minecraft:plant', 'minecraft:pool': 'minecraft:aztec',
+             'minecraft:sunset': 'minecraft:alban', 'minecraft:meditative': 'minecraft:kebab'}
 
 # Trades -------------------------------------------------------------------------------------------------------------
 E = 'emerald'
@@ -115,6 +119,7 @@ def cottage():
         t.set(x, y, z, state, nbt)
     for x, z in posts:
         t.column(x, z, -8, -1, log('spruce_log'))
+    hung = []
     for e in src['entities']:
         nbt = e['nbt']
         kind = str(nbt['id'])
@@ -128,11 +133,22 @@ def cottage():
             item = str(nbt['Item']['id'])
             t.item_frame(int(e['blockPos'][0]), int(e['blockPos'][1]), int(e['blockPos'][2]), facing, item)
         elif kind == 'minecraft:painting':
-            p = Compound({k: v for k, v in nbt.items() if k in ('id', 'facing', 'variant', 'Rotation')})
-            # Hanging entities need their block; the game moves it with the entity when it places the template.
+            # The 1.x paintings were larger than the walls they hung on (the 2x2 ones overlapped a shelf or the wall
+            # itself, and dropped as items): each becomes a one-block painting, which exists on every version, on its
+            # own block with the wall behind it.
             bx, by, bz = (int(v) for v in e['blockPos'])
-            p.update({'TileX': Int(bx), 'TileY': Int(by), 'TileZ': Int(bz)})
-            t.entities.append(((x, y, z), p))
+            facing = int(nbt['facing'])
+            step = {0: (0, 1), 1: (-1, 0), 2: (0, -1), 3: (1, 0)}[facing]
+            p = Compound({'id': String('minecraft:painting'), 'facing': Byte(facing),
+                          'variant': String(PAINTINGS[str(nbt['variant'])]),
+                          'Rotation': List[Float]([Float({0: 0, 1: 90, 2: 180, 3: 270}[facing]), Float(0)]),
+                          'TileX': Int(bx), 'TileY': Int(by), 'TileZ': Int(bz)})
+            hung.append((bx, by, bz, step))
+            t.entities.append(((bx + 0.5 - step[0] * 0.46875, by + 0.5, bz + 0.5 - step[1] * 0.46875), p))
+    for x, y, z, (dx, dz) in hung:
+        front = t.blocks.get((x, y, z), (AIR, None))[0]
+        back = t.blocks.get((x - dx, y, z - dz), (AIR, None))[0]
+        assert front.split('[')[0] in (AIR, 'minecraft:vine') and back != AIR, f'painting at {x} {y} {z}: {front} on {back}'
     # A crab pot already set in the water by the dock, so the first thing players see is what the mod adds.
     t.set(15, deck - 2, 1, f'{NS}:crab_pot[facing=north,waterlogged=false,baited=true,caught=false]')
     t.set(15, deck - 1, 1, 'minecraft:chain[axis=y]')

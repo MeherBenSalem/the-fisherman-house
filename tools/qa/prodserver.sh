@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Smoke-tests a release jar from releases/ on a real (production) server: vanilla Minecraft with the real loader
 # installed by its installer, the remapped jar (plus Fabric API on Fabric), RCON on 25576 and the game on 25566, so it
-# can run beside a dev server.
+# can run beside a dev server. The server never pauses when empty (newer versions stop ticking after 60 s without
+# players, and the checks run without one).
 #   tools/qa/prodserver.sh setup <workspace> <loader>   # download and install into $QA_LOGS/prod/<ws>-<loader>
 #   tools/qa/prodserver.sh start <workspace> <loader>
 #   tools/qa/prodserver.sh check <workspace> <loader>   # coast_checks.py (server checks) against it
@@ -55,6 +56,7 @@ view-distance=8
 simulation-distance=6
 difficulty=normal
 spawn-monsters=false
+pause-when-empty-seconds=-1
 PROPS
   echo "set up $dir with $(basename "$jar")"
 }

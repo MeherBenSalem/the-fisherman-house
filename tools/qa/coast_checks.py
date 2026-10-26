@@ -204,7 +204,9 @@ def check_structures(s):
             located[sid] = info
             check(f'natural {sid}: loot rolled into the containers', info['stacks'] >= 2, info.get('raw'))
             if sid in HANGING:
-                # A painting or item frame that is not on its block drops as an item: all of them must still hang.
+                # A painting or item frame that cannot hang drops as an item at its next survival check (every 5 s):
+                # all of them must still hang after that.
+                time.sleep(12)
                 x1, y1, z1, x2, y2, z2 = info['box']
                 area = f'x={x1},y={y1},z={z1},dx={x2 - x1},dy={y2 - y1},dz={z2 - z1}'
                 found = tuple(s.entities(f'@e[type=minecraft:{kind},{area}]') for kind in ('painting', 'item_frame'))
