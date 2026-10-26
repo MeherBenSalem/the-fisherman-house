@@ -5,7 +5,7 @@
 # name and checked against the metadata inside each jar.
 #
 # Secrets:   MODRINTH_TOKEN, CURSEFORGE_TOKEN, CURSEFORGE_API_KEY (optional: lets a rerun skip files already on CurseForge)
-# Variables: MODRINTH_ID, CURSEFORGE_ID (secrets with these names work too)
+# Variables: MODRINTH_ID, CURSEFORGE_ID (secrets with these names work too; default: this mod's projects)
 #
 # Run it from the Actions tab (workflow_dispatch) or push a tag: git tag v2.0.0 && git push origin v2.0.0
 # Re-running is safe: versions that already exist on a platform are skipped.
@@ -136,8 +136,8 @@ jobs:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
           CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
           CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
-          MODRINTH_ID: ${{ vars.MODRINTH_ID || secrets.MODRINTH_ID }}
-          CURSEFORGE_ID: ${{ vars.CURSEFORGE_ID || secrets.CURSEFORGE_ID }}
+          MODRINTH_ID: ${{ vars.MODRINTH_ID || secrets.MODRINTH_ID || 'Dku9hJfB' }}
+          CURSEFORGE_ID: ${{ vars.CURSEFORGE_ID || secrets.CURSEFORGE_ID || '1388089' }}
           VERSION: ${{ steps.ver.outputs.version }}
           PLATFORMS: ${{ inputs.platforms || 'both' }}
         shell: bash
@@ -275,7 +275,7 @@ jobs:
         if: ${{ inputs.update_listing && !inputs.dry_run }}
         env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-          MODRINTH_ID: ${{ vars.MODRINTH_ID || secrets.MODRINTH_ID }}
+          MODRINTH_ID: ${{ vars.MODRINTH_ID || secrets.MODRINTH_ID || 'Dku9hJfB' }}
         shell: bash
         run: |
           set -euo pipefail
