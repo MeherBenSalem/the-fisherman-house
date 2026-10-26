@@ -4,8 +4,8 @@
 # They are named fisherman_house-{loader}-{minecraft}-{version}.jar; the loader and Minecraft version are read from the
 # name and checked against the metadata inside each jar.
 #
-# Secrets:   MODRINTH_TOKEN, CURSEFORGE_TOKEN, CURSEFORGE_API_KEY
-# Variables: MODRINTH_ID, CURSEFORGE_ID
+# Secrets:   MODRINTH_TOKEN, CURSEFORGE_TOKEN, CURSEFORGE_API_KEY (optional: lets a rerun skip files already on CurseForge)
+# Variables: MODRINTH_ID, CURSEFORGE_ID (secrets with these names work too)
 #
 # Run it from the Actions tab (workflow_dispatch) or push a tag: git tag v2.0.0 && git push origin v2.0.0
 # Re-running is safe: versions that already exist on a platform are skipped.
@@ -136,8 +136,8 @@ jobs:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
           CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
           CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
-          MODRINTH_ID: ${{ vars.MODRINTH_ID }}
-          CURSEFORGE_ID: ${{ vars.CURSEFORGE_ID }}
+          MODRINTH_ID: ${{ vars.MODRINTH_ID || secrets.MODRINTH_ID }}
+          CURSEFORGE_ID: ${{ vars.CURSEFORGE_ID || secrets.CURSEFORGE_ID }}
           VERSION: ${{ steps.ver.outputs.version }}
           PLATFORMS: ${{ inputs.platforms || 'both' }}
         shell: bash
@@ -155,7 +155,7 @@ jobs:
           const jars = fs.readFileSync('jar-list.txt', 'utf8').split('\n').map((s) => s.trim()).filter(Boolean);
           const changelog = fs.readFileSync(path.join('patchnotes', `${version}.md`), 'utf8');
           for (const [key, needed] of [['MODRINTH_TOKEN', doModrinth], ['MODRINTH_ID', doModrinth],
-              ['CURSEFORGE_TOKEN', doCurse], ['CURSEFORGE_API_KEY', doCurse], ['CURSEFORGE_ID', doCurse]]) {
+              ['CURSEFORGE_TOKEN', doCurse], ['CURSEFORGE_ID', doCurse]]) {
             if (needed && !env[key]) throw new Error(`${key} is not set`);
           }
 
@@ -229,9 +229,15 @@ jobs:
             const flat = flattenVersions(JSON.parse(await request('https://minecraft.curseforge.com/api/game/versions',
               { headers: { 'X-Api-Token': env.CURSEFORGE_TOKEN } }, 'CurseForge game versions')));
             if (!flat.length) throw new Error('No CurseForge game versions resolved');
-            const files = JSON.parse(await request(`https://api.curseforge.com/v1/mods/${env.CURSEFORGE_ID}/files?pageSize=50`,
-              { headers: { 'x-api-key': env.CURSEFORGE_API_KEY } }, 'CurseForge files'));
-            const existing = (files.data || []).map((f) => f.displayName || f.fileName);
+            // Listing the files already uploaded needs the Core API key; without it every jar is uploaded.
+            let existing = [];
+            if (env.CURSEFORGE_API_KEY) {
+              const files = JSON.parse(await request(`https://api.curseforge.com/v1/mods/${env.CURSEFORGE_ID}/files?pageSize=50`,
+                { headers: { 'x-api-key': env.CURSEFORGE_API_KEY } }, 'CurseForge files'));
+              existing = (files.data || []).map((f) => f.displayName || f.fileName);
+            } else {
+              console.log('::warning::CURSEFORGE_API_KEY is not set: files already on CurseForge are not detected and would be uploaded again');
+            }
             for (const jar of jars) {
               const name = path.basename(jar);
               if (existing.includes(name)) {
@@ -269,7 +275,7 @@ jobs:
         if: ${{ inputs.update_listing && !inputs.dry_run }}
         env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-          MODRINTH_ID: ${{ vars.MODRINTH_ID }}
+          MODRINTH_ID: ${{ vars.MODRINTH_ID || secrets.MODRINTH_ID }}
         shell: bash
         run: |
           set -euo pipefail
