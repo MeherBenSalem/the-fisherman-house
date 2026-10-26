@@ -14,6 +14,7 @@ Listing copy and artwork for CurseForge and Modrinth.
 | `source/render.cjs` | Renders every PNG above from the screenshots, the mod's textures and the bundled fonts. |
 | `source/config-excerpt.json` | The config file as the mod writes it on first start, shown on the config card. |
 | `source/fonts/` | Playfair Display, Barlow and Barlow Condensed, all under the SIL Open Font License (licence files included). |
+| `reel/` | A 26-second Instagram reel (1080×1920) made from in-game footage, with its own music; see `reel/README.md`. |
 
 The look: a weathered harbour at dusk. Deep sea blue behind everything with a faint fish-scale wave pattern, a warm
 lantern glow, sand-gold serif titles in Playfair Display over clean Barlow text, rope-textured rules and borders, and

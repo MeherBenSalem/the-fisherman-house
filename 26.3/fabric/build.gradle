@@ -26,13 +26,15 @@ loom {
             ideConfigGenerated(true)
             runDir('runs/server')
         }
-        // QA client: joins a server on localhost:25565 straight away (see tools/qa/).
+        // QA client: joins a server on localhost:25565 straight away (see tools/qa/). QA_WIDTH and QA_HEIGHT size the
+        // window (the portrait reel in marketing/reel/ uses 1080x1920).
         qaClient {
             client()
             setConfigName('Fabric QA Client')
             ideConfigGenerated(false)
             runDir('runs/client')
-            programArgs('--quickPlayMultiplayer', 'localhost:25565', '--username', 'Builder', '--width', '1920', '--height', '1080')
+            programArgs('--quickPlayMultiplayer', 'localhost:25565', '--username', 'Builder',
+                    '--width', System.getenv('QA_WIDTH') ?: '1920', '--height', System.getenv('QA_HEIGHT') ?: '1080')
         }
     }
 }

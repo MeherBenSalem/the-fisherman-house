@@ -1,0 +1,21 @@
+{
+  "fps": 30,
+  "bpm": 120,
+  "duration": 26.0,
+  "clips": [
+    {"name": "beach", "start": 0.0, "end": 2.0},
+    {"name": "lighthouse", "start": 2.0, "end": 5.0},
+    {"name": "cottage", "start": 5.0, "end": 6.5, "place": 1, "title": "Fisherman's Cottage", "where": "sandy & snowy beaches", "color": "sand"},
+    {"name": "pier", "start": 6.5, "end": 8.0, "place": 2, "title": "Harbour Pier", "where": "sandy beaches", "color": "lantern"},
+    {"name": "lighthouse_day", "start": 8.0, "end": 9.5, "place": 3, "title": "Lighthouse", "where": "stony shores", "color": "buoy"},
+    {"name": "stilt", "start": 9.5, "end": 11.0, "place": 4, "title": "Stilt Shack", "where": "swamps & mangroves", "color": "swamp"},
+    {"name": "ice", "start": 11.0, "end": 12.5, "place": 5, "title": "Ice Fishing Camp", "where": "frozen oceans", "color": "ice"},
+    {"name": "boathouse", "start": 12.5, "end": 14.0, "place": 6, "title": "River Boathouse", "where": "riverbanks", "color": "kelp"},
+    {"name": "trawler", "start": 14.0, "end": 16.0, "place": 7, "title": "Sunken Trawler", "where": "the ocean floor", "color": "ice"},
+    {"name": "pots", "start": 16.0, "end": 18.0},
+    {"name": "bait", "file": "pots", "start": 18.0, "end": 19.5, "still": true},
+    {"name": "trades", "start": 19.5, "end": 21.0, "still": true},
+    {"name": "bottle", "start": 21.0, "end": 22.5, "still": true},
+    {"name": "end", "start": 22.5, "end": 26.0}
+  ]
+}
