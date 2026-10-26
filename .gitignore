@@ -39,7 +39,7 @@ credentials.json
 # QA scratch output
 marketing/images/explore/
 marketing/source/.render-*.html
-tools/**/__pycache__/
+**/__pycache__/
 **/logs/
 
 # The reel's alternative audio version (rebuilt by marketing/reel/make.sh)
