@@ -216,7 +216,7 @@ def check_structures(s):
     check('locate #fisherman_house:coastal', f'{NS}:' in tag, tag)
     # The templates also place on their own (entities, containers, pots), in the sky over spawn. The house's template
     # is the repaired `cottage`; its id `fisherman_house` keeps the 1.x template for houses 1.x left half-generated.
-    # /place template is vanilla's own placement, which on 1.20.1 and 1.21.1 logs "invalid position" for every painting
+    # /place template is vanilla's own placement, which before 26.3 logs "invalid position" for every painting
     # and item frame (the mod's structure piece places them itself); the log check allows that between these markers.
     s.cmd(f'say {VANILLA_PLACE[0]}')
     for i, sid in enumerate(STRUCTURES):
@@ -451,6 +451,9 @@ def check_log(path):
         elif re.search(r'/(ERROR|FATAL)\]|Exception|Couldn\'t parse|Failed to (load|parse)', l) \
                 and 'Narrator' not in l and 'realms' not in l.lower():
             errors.append(l)
+    # NeoForge 26.x servers log this on Linux at startup with no mods at all (its debug log probes netty's macOS/BSD
+    # transport); it says nothing about the mod.
+    errors = [l for l in errors if 'io.netty.channel.kqueue' not in l and 'Only supported on OSX/BSD' not in l]
     ours = [l for l in errors if NS in l or 'fishermanhouse' in l or 'loot' in l.lower() or 'structure' in l.lower()]
     check('log: no errors about the mod, its loot or structures', not ours, ours[:3])
     check('log: no errors at all', not errors, errors[:3])
