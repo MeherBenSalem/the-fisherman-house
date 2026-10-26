@@ -144,7 +144,8 @@ Release notes for a version live in `patchnotes/<version>.md`.
   structures, loot modifiers) into every workspace in that version's format. Edit the tables there, not the JSON.
 - [`tools/gen_textures.py`](tools/gen_textures.py): draws the block and item textures.
 - [`tools/qa/`](tools/qa): dev servers and a real game client under Xvfb. `coast_checks.py` checks every feature in
-  game, `run_matrix.sh` runs it on every build, `rarity.py` measures how far apart the structures are,
+  game, `run_matrix.sh` runs it on every build, `prodserver.sh` tests a release jar on a real server, `migration.sh`
+  opens a 1.1.0 world with 2.0, `rarity.py` measures how far apart the structures are,
   `marketing_shots.py` captures the listing screenshots.
 - [`marketing/`](marketing): the CurseForge/Modrinth description, listing images and how to regenerate them.
 

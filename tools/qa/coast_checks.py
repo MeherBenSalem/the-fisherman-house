@@ -46,6 +46,8 @@ STRUCTURES = {
 }
 # Structures whose template has another name (the house's 1.x template keeps the house's id).
 TEMPLATES = {'fisherman_house': 'cottage'}
+# Paintings and item frames in a structure.
+HANGING = {'fisherman_house': (6, 3)}
 VANILLA_PLACE = ('QA: vanilla /place template from here', 'QA: vanilla /place template done')
 TABLES = ['chests/' + t for t in ('fisherman_house', 'fisherman_house_storage', 'harbour_pier', 'harbour_pier_storage',
                                   'lighthouse', 'stilt_shack', 'ice_fishing_camp', 'river_boathouse', 'sunken_trawler',
@@ -201,6 +203,12 @@ def check_structures(s):
         if info.get('id') == sid:
             located[sid] = info
             check(f'natural {sid}: loot rolled into the containers', info['stacks'] >= 2, info.get('raw'))
+            if sid in HANGING:
+                # A painting or item frame that is not on its block drops as an item: all of them must still hang.
+                x1, y1, z1, x2, y2, z2 = info['box']
+                area = f'x={x1},y={y1},z={z1},dx={x2 - x1},dy={y2 - y1},dz={z2 - z1}'
+                found = tuple(s.entities(f'@e[type=minecraft:{kind},{area}]') for kind in ('painting', 'item_frame'))
+                check(f'natural {sid}: paintings and item frames hang in place', found == HANGING[sid], found)
         s.cmd('forceload remove all')
     tag = s.cmd(f'locate structure #{NS}:coastal')
     check('locate #fisherman_house:coastal', f'{NS}:' in tag, tag)

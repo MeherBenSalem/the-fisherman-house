@@ -84,6 +84,15 @@ tools/qa/run_matrix.sh                       # all builds; results in /tmp/fc-qa
 tools/qa/run_matrix.sh 26.3:fabric 1.20.1:forge
 ```
 
+Release jars are smoke-tested on real servers (vanilla with the real loader from its installer, the jar from
+`releases/`, game port 25566 and RCON 25576, so it can run beside a dev server), and a 1.1.0 world is upgraded:
+
+```bash
+tools/build_release.sh
+tools/qa/prodserver.sh run 1.20.1 forge           # setup, start, server checks, stop
+tools/qa/migration.sh <path to a 1.1.0 Fabric 1.20.1 jar>
+```
+
 `tools/qa/rarity.py` prints how far the nearest of each structure is from a grid of points on a running server.
 Stop dev runs with `devrun.sh stop-client` / `stop-server`, which only look at Java processes.
 
