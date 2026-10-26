@@ -42,5 +42,5 @@ marketing/source/.render-*.html
 **/__pycache__/
 **/logs/
 
-# The reel's alternative audio version (rebuilt by marketing/reel/make.sh)
-marketing/reel/*-sfx-only.mp4
+# The reel's videos are build outputs (marketing/reel/make.sh): delivered directly, never committed
+marketing/reel/*.mp4

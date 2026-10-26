@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Builds the reel from the captured footage (build/frames/, see capture.py): audio, frames, then the two MP4s.
+# Builds the reel from the narration and the captured footage (see README.md): audio, frames, then the two MP4s.
 #   marketing/reel/make.sh            # everything
 #   marketing/reel/make.sh encode     # only re-encode (after audio.py or edit.cjs ran)
 set -euo pipefail
@@ -21,8 +21,9 @@ encode() {  # audio wav, output mp4
     -c:a aac -b:a 192k -ar 48000 -movflags +faststart -shortest "$2"
   echo "wrote $2 ($(du -h "$2" | cut -f1))"
 }
-encode build/mix.wav fishermans-coast-reel.mp4
-encode build/sfx.wav fishermans-coast-reel-sfx-only.mp4
-# The cover (the frame shown on the profile grid): the title over the lighthouse at sunset.
-cp build/out/00114.jpg cover.jpg
-echo "wrote cover.jpg"
+encode build/mix.wav fishermans-coast-reel.mp4                 # narration, music bed, effects
+encode build/voice_sfx.wav fishermans-coast-reel-no-music.mp4  # narration and effects, to add a track in Instagram
+# The cover (the frame shown on the profile grid): the title over the lighthouse at sunset, once it is fully in.
+frame=$(python3 -c "import json; t = json.load(open('timeline.json')); print(round((t['sentences']['s03'] + 0.8) * 30))")
+cp "build/out/$(printf '%05d' "$frame").jpg" cover.jpg
+echo "wrote cover.jpg (frame $frame)"

@@ -1,21 +1,604 @@
 {
-  "fps": 30,
-  "bpm": 120,
-  "duration": 26.0,
-  "clips": [
-    {"name": "beach", "start": 0.0, "end": 2.0},
-    {"name": "lighthouse", "start": 2.0, "end": 5.0},
-    {"name": "cottage", "start": 5.0, "end": 6.5, "place": 1, "title": "Fisherman's Cottage", "where": "sandy & snowy beaches", "color": "sand"},
-    {"name": "pier", "start": 6.5, "end": 8.0, "place": 2, "title": "Harbour Pier", "where": "sandy beaches", "color": "lantern"},
-    {"name": "lighthouse_day", "start": 8.0, "end": 9.5, "place": 3, "title": "Lighthouse", "where": "stony shores", "color": "buoy"},
-    {"name": "stilt", "start": 9.5, "end": 11.0, "place": 4, "title": "Stilt Shack", "where": "swamps & mangroves", "color": "swamp"},
-    {"name": "ice", "start": 11.0, "end": 12.5, "place": 5, "title": "Ice Fishing Camp", "where": "frozen oceans", "color": "ice"},
-    {"name": "boathouse", "start": 12.5, "end": 14.0, "place": 6, "title": "River Boathouse", "where": "riverbanks", "color": "kelp"},
-    {"name": "trawler", "start": 14.0, "end": 16.0, "place": 7, "title": "Sunken Trawler", "where": "the ocean floor", "color": "ice"},
-    {"name": "pots", "start": 16.0, "end": 18.0},
-    {"name": "bait", "file": "pots", "start": 18.0, "end": 19.5, "still": true},
-    {"name": "trades", "start": 19.5, "end": 21.0, "still": true},
-    {"name": "bottle", "start": 21.0, "end": 22.5, "still": true},
-    {"name": "end", "start": 22.5, "end": 26.0}
-  ]
+ "fps": 30,
+ "bpm": 120,
+ "duration": 34.06666666666667,
+ "clips": [
+  {
+   "name": "beach",
+   "start": 0.0,
+   "end": 2.5
+  },
+  {
+   "name": "lighthouse",
+   "start": 2.5,
+   "end": 6.733333333333333
+  },
+  {
+   "name": "cottage",
+   "start": 6.733333333333333,
+   "end": 8.266666666666667,
+   "place": 1,
+   "title": "Fisherman's Cottage",
+   "where": "sandy & snowy beaches",
+   "color": "sand"
+  },
+  {
+   "name": "pier",
+   "start": 8.266666666666667,
+   "end": 9.533333333333333,
+   "place": 2,
+   "title": "Harbour Pier",
+   "where": "sandy beaches",
+   "color": "lantern"
+  },
+  {
+   "name": "lighthouse_day",
+   "start": 9.533333333333333,
+   "end": 10.6,
+   "place": 3,
+   "title": "Lighthouse",
+   "where": "stony shores",
+   "color": "buoy"
+  },
+  {
+   "name": "stilt",
+   "start": 10.6,
+   "end": 11.833333333333334,
+   "place": 4,
+   "title": "Stilt Shack",
+   "where": "swamps & mangroves",
+   "color": "swamp"
+  },
+  {
+   "name": "ice",
+   "start": 11.833333333333334,
+   "end": 13.2,
+   "place": 5,
+   "title": "Ice Fishing Camp",
+   "where": "frozen oceans",
+   "color": "ice"
+  },
+  {
+   "name": "boathouse",
+   "start": 13.2,
+   "end": 14.566666666666666,
+   "place": 6,
+   "title": "River Boathouse",
+   "where": "riverbanks",
+   "color": "kelp"
+  },
+  {
+   "name": "trawler",
+   "start": 14.566666666666666,
+   "end": 17.0,
+   "place": 7,
+   "title": "Sunken Trawler",
+   "where": "the ocean floor",
+   "color": "ice"
+  },
+  {
+   "name": "pots",
+   "start": 17.0,
+   "end": 19.933333333333334
+  },
+  {
+   "name": "bait",
+   "start": 19.933333333333334,
+   "end": 22.433333333333334,
+   "file": "pots",
+   "still": true
+  },
+  {
+   "name": "trades",
+   "start": 22.433333333333334,
+   "end": 25.366666666666667,
+   "still": true
+  },
+  {
+   "name": "bottle",
+   "start": 25.366666666666667,
+   "end": 28.433333333333334,
+   "still": true
+  },
+  {
+   "name": "end",
+   "start": 28.433333333333334,
+   "end": 34.06666666666667
+  }
+ ],
+ "sentences": {
+  "s01": 0.12,
+  "s02": 2.49,
+  "s03": 3.535,
+  "s04": 6.746,
+  "s05": 14.576,
+  "s06": 16.986,
+  "s07": 19.919,
+  "s08": 22.428,
+  "s09": 25.358,
+  "s10": 28.426,
+  "s11": 31.693
+ },
+ "words": [
+  {
+   "w": "Minecraft",
+   "s": 0.12,
+   "e": 0.54,
+   "sid": "s01"
+  },
+  {
+   "w": "beaches",
+   "s": 0.54,
+   "e": 1.02,
+   "sid": "s01"
+  },
+  {
+   "w": "are",
+   "s": 1.02,
+   "e": 1.64,
+   "sid": "s01"
+  },
+  {
+   "w": "boring.",
+   "s": 1.64,
+   "e": 2.02,
+   "sid": "s01"
+  },
+  {
+   "w": "Not",
+   "s": 2.49,
+   "e": 2.73,
+   "sid": "s02"
+  },
+  {
+   "w": "anymore.",
+   "s": 2.73,
+   "e": 3.01,
+   "sid": "s02"
+  },
+  {
+   "w": "Fisherman's",
+   "s": 3.535,
+   "e": 4.015,
+   "sid": "s03"
+  },
+  {
+   "w": "Coast",
+   "s": 4.015,
+   "e": 4.295,
+   "sid": "s03"
+  },
+  {
+   "w": "adds",
+   "s": 4.295,
+   "e": 4.835,
+   "sid": "s03"
+  },
+  {
+   "w": "seven",
+   "s": 4.835,
+   "e": 5.235,
+   "sid": "s03"
+  },
+  {
+   "w": "places",
+   "s": 5.235,
+   "e": 5.715,
+   "sid": "s03"
+  },
+  {
+   "w": "to",
+   "s": 5.715,
+   "e": 5.935,
+   "sid": "s03"
+  },
+  {
+   "w": "explore.",
+   "s": 5.935,
+   "e": 6.275,
+   "sid": "s03"
+  },
+  {
+   "w": "A",
+   "s": 6.746,
+   "e": 6.886,
+   "sid": "s04"
+  },
+  {
+   "w": "fisherman's",
+   "s": 6.886,
+   "e": 7.386,
+   "sid": "s04"
+  },
+  {
+   "w": "cottage,",
+   "s": 7.386,
+   "e": 8.306,
+   "sid": "s04"
+  },
+  {
+   "w": "a",
+   "s": 8.306,
+   "e": 8.366,
+   "sid": "s04"
+  },
+  {
+   "w": "harbour",
+   "s": 8.366,
+   "e": 8.626,
+   "sid": "s04"
+  },
+  {
+   "w": "pier,",
+   "s": 8.626,
+   "e": 9.566,
+   "sid": "s04"
+  },
+  {
+   "w": "a",
+   "s": 9.566,
+   "e": 9.626,
+   "sid": "s04"
+  },
+  {
+   "w": "lighthouse,",
+   "s": 9.626,
+   "e": 10.646,
+   "sid": "s04"
+  },
+  {
+   "w": "a",
+   "s": 10.646,
+   "e": 10.696,
+   "sid": "s04"
+  },
+  {
+   "w": "stilt",
+   "s": 10.686,
+   "e": 11.006,
+   "sid": "s04"
+  },
+  {
+   "w": "shack,",
+   "s": 11.006,
+   "e": 11.886,
+   "sid": "s04"
+  },
+  {
+   "w": "an",
+   "s": 11.886,
+   "e": 11.986,
+   "sid": "s04"
+  },
+  {
+   "w": "ice",
+   "s": 11.986,
+   "e": 12.186,
+   "sid": "s04"
+  },
+  {
+   "w": "fishing",
+   "s": 12.186,
+   "e": 12.446,
+   "sid": "s04"
+  },
+  {
+   "w": "camp,",
+   "s": 12.446,
+   "e": 13.246,
+   "sid": "s04"
+  },
+  {
+   "w": "a",
+   "s": 13.246,
+   "e": 13.326,
+   "sid": "s04"
+  },
+  {
+   "w": "river",
+   "s": 13.326,
+   "e": 13.526,
+   "sid": "s04"
+  },
+  {
+   "w": "boathouse.",
+   "s": 13.526,
+   "e": 14.066,
+   "sid": "s04"
+  },
+  {
+   "w": "And",
+   "s": 14.576,
+   "e": 14.756,
+   "sid": "s05"
+  },
+  {
+   "w": "a",
+   "s": 14.756,
+   "e": 14.856,
+   "sid": "s05"
+  },
+  {
+   "w": "sunken",
+   "s": 14.856,
+   "e": 15.276,
+   "sid": "s05"
+  },
+  {
+   "w": "trawler,",
+   "s": 15.276,
+   "e": 15.796,
+   "sid": "s05"
+  },
+  {
+   "w": "full",
+   "s": 15.796,
+   "e": 16.136,
+   "sid": "s05"
+  },
+  {
+   "w": "of",
+   "s": 16.136,
+   "e": 16.316,
+   "sid": "s05"
+  },
+  {
+   "w": "loot.",
+   "s": 16.316,
+   "e": 16.516,
+   "sid": "s05"
+  },
+  {
+   "w": "Crab",
+   "s": 16.986,
+   "e": 17.206,
+   "sid": "s06"
+  },
+  {
+   "w": "pots",
+   "s": 17.206,
+   "e": 17.446,
+   "sid": "s06"
+  },
+  {
+   "w": "fish",
+   "s": 17.446,
+   "e": 17.686,
+   "sid": "s06"
+  },
+  {
+   "w": "for",
+   "s": 17.686,
+   "e": 17.906,
+   "sid": "s06"
+  },
+  {
+   "w": "you,",
+   "s": 17.906,
+   "e": 18.366,
+   "sid": "s06"
+  },
+  {
+   "w": "even",
+   "s": 18.366,
+   "e": 18.586,
+   "sid": "s06"
+  },
+  {
+   "w": "while",
+   "s": 18.586,
+   "e": 18.846,
+   "sid": "s06"
+  },
+  {
+   "w": "you're",
+   "s": 18.846,
+   "e": 19.046,
+   "sid": "s06"
+  },
+  {
+   "w": "AFK.",
+   "s": 19.046,
+   "e": 19.506,
+   "sid": "s06"
+  },
+  {
+   "w": "Bait",
+   "s": 19.919,
+   "e": 20.139,
+   "sid": "s07"
+  },
+  {
+   "w": "makes",
+   "s": 20.139,
+   "e": 20.459,
+   "sid": "s07"
+  },
+  {
+   "w": "them",
+   "s": 20.459,
+   "e": 20.719,
+   "sid": "s07"
+  },
+  {
+   "w": "faster",
+   "s": 20.719,
+   "e": 21.239,
+   "sid": "s07"
+  },
+  {
+   "w": "and",
+   "s": 21.239,
+   "e": 21.699,
+   "sid": "s07"
+  },
+  {
+   "w": "luckier.",
+   "s": 21.699,
+   "e": 22.099,
+   "sid": "s07"
+  },
+  {
+   "w": "Six",
+   "s": 22.428,
+   "e": 22.748,
+   "sid": "s08"
+  },
+  {
+   "w": "fishermen",
+   "s": 22.748,
+   "e": 23.288,
+   "sid": "s08"
+  },
+  {
+   "w": "sell",
+   "s": 23.288,
+   "e": 23.708,
+   "sid": "s08"
+  },
+  {
+   "w": "exclusive",
+   "s": 23.708,
+   "e": 24.268,
+   "sid": "s08"
+  },
+  {
+   "w": "trades.",
+   "s": 24.268,
+   "e": 24.728,
+   "sid": "s08"
+  },
+  {
+   "w": "And",
+   "s": 25.358,
+   "e": 25.478,
+   "sid": "s09"
+  },
+  {
+   "w": "messages",
+   "s": 25.478,
+   "e": 25.898,
+   "sid": "s09"
+  },
+  {
+   "w": "in",
+   "s": 25.898,
+   "e": 26.238,
+   "sid": "s09"
+  },
+  {
+   "w": "a",
+   "s": 26.238,
+   "e": 26.318,
+   "sid": "s09"
+  },
+  {
+   "w": "bottle",
+   "s": 26.318,
+   "e": 26.718,
+   "sid": "s09"
+  },
+  {
+   "w": "can",
+   "s": 26.718,
+   "e": 27.098,
+   "sid": "s09"
+  },
+  {
+   "w": "lead",
+   "s": 27.098,
+   "e": 27.378,
+   "sid": "s09"
+  },
+  {
+   "w": "to",
+   "s": 27.378,
+   "e": 27.538,
+   "sid": "s09"
+  },
+  {
+   "w": "treasure.",
+   "s": 27.538,
+   "e": 27.798,
+   "sid": "s09"
+  },
+  {
+   "w": "It's",
+   "s": 28.426,
+   "e": 28.646,
+   "sid": "s10"
+  },
+  {
+   "w": "free",
+   "s": 28.646,
+   "e": 28.846,
+   "sid": "s10"
+  },
+  {
+   "w": "on",
+   "s": 28.846,
+   "e": 29.066,
+   "sid": "s10"
+  },
+  {
+   "w": "Fabric,",
+   "s": 29.066,
+   "e": 29.806,
+   "sid": "s10"
+  },
+  {
+   "w": "NeoForge",
+   "s": 29.806,
+   "e": 30.826,
+   "sid": "s10"
+  },
+  {
+   "w": "and",
+   "s": 30.826,
+   "e": 30.926,
+   "sid": "s10"
+  },
+  {
+   "w": "Forge.",
+   "s": 30.926,
+   "e": 31.406,
+   "sid": "s10"
+  },
+  {
+   "w": "Send",
+   "s": 31.693,
+   "e": 31.933,
+   "sid": "s11"
+  },
+  {
+   "w": "this",
+   "s": 31.933,
+   "e": 32.213,
+   "sid": "s11"
+  },
+  {
+   "w": "to",
+   "s": 32.213,
+   "e": 32.433,
+   "sid": "s11"
+  },
+  {
+   "w": "your",
+   "s": 32.433,
+   "e": 32.553,
+   "sid": "s11"
+  },
+  {
+   "w": "fishing",
+   "s": 32.553,
+   "e": 32.853,
+   "sid": "s11"
+  },
+  {
+   "w": "buddy.",
+   "s": 32.853,
+   "e": 33.173,
+   "sid": "s11"
+  }
+ ]
 }

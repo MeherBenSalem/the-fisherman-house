@@ -31,6 +31,15 @@ for (const clip of timeline.clips) {
     : fs.readdirSync(dir).filter((f) => f.endsWith('.jpg')).sort().map((f) => url(path.join(dir, f)));
 }
 sources.end = [sources.beach[0]];
+// Never let a shot run past the end of its footage: the edit would hold a frozen frame. Recapture with capture.py
+// after the narration changes the timing.
+for (const clip of timeline.clips) {
+  if (clip.still || clip.name === 'end') continue;
+  const need = Math.round((clip.end - clip.start) * timeline.fps);
+  if (sources[clip.name].length < need) {
+    throw new Error(`${clip.name}: ${need} frames needed, ${sources[clip.name].length} captured (run capture.py ${clip.name})`);
+  }
+}
 
 const item = (name) => url(path.join(textures, 'item', name + '.png'));
 const icon = url(path.join(root, 'marketing', 'images', 'icon.png'));
@@ -94,6 +103,11 @@ html, body { width: 1080px; height: 1920px; overflow: hidden; background: #000; 
        color: ${C.deep}; font-family: Body, sans-serif; font-weight: 800; font-size: 50px; box-shadow: 0 18px 44px rgba(0,0,0,.5); }
 .rope { width: 520px; height: 10px; border-radius: 5px; margin: 26px 0 24px;
         background: repeating-linear-gradient(135deg, ${C.rope} 0 9px, #8a6a3a 9px 14px); box-shadow: 0 4px 0 rgba(6,18,28,.7); }
+#caption { top: 1440px; left: 90px; right: 150px; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 12px 12px;
+           transform: translateY(-50%); }
+.cw { font-family: Body, sans-serif; font-weight: 800; font-size: 60px; line-height: 1; color: #111; background: #fff;
+      padding: 8px 18px 12px; border-radius: 14px; box-shadow: 0 8px 0 rgba(6,18,28,.55), 0 14px 30px rgba(0,0,0,.35); }
+.cw.on { background: #FFD60A; }
 .iconimg { width: 250px; height: 250px; border-radius: 52px; box-shadow: 0 0 0 6px rgba(6,18,28,.85), 0 24px 60px rgba(0,0,0,.6); }
 </style></head><body><div id="stage">
 <img id="bgFill">
@@ -103,35 +117,34 @@ html, body { width: 1080px; height: 1920px; overflow: hidden; background: #000; 
 <div id="shadeBottom" class="shade"></div>
 <div id="veil"></div>
 
-<!-- 0-2 s: the hook, readable from the first frame and without sound -->
+<!-- The hook, readable from the first frame and without sound; each word pops in as it is spoken -->
 <div id="hook" class="el cap" style="top: 470px; font-size: 150px;">
   <div><span class="word" id="w1">Minecraft</span></div>
   <div><span class="word" id="w2">beaches</span> <span class="word" id="w3">are</span></div>
   <div style="margin-top: 22px"><span class="word box" id="w4">boring.</span></div>
 </div>
 
-<!-- 2-3 s: the turn -->
+<!-- The turn: the beat drops on "Not anymore." -->
 <div id="turn" class="el" style="top: 520px;">
   <div class="display" style="font-style: italic; font-size: 190px; color: ${C.lantern}; -webkit-text-stroke: 16px rgba(6,18,28,.95);
        paint-order: stroke fill; filter: drop-shadow(0 10px 0 rgba(6,18,28,.6));">Not<br>anymore.</div>
 </div>
 
-<!-- 3-5 s: who is talking -->
-<div id="title" class="el" style="top: 930px;">
+<!-- Who is talking -->
+<div id="title" class="el" style="top: 700px;">
   <img class="iconimg" id="titleIcon" src="${icon}">
   <div class="kicker" id="titleKicker" style="margin-top: 34px;">The Minecraft mod</div>
   <div class="display gold" id="titleName" style="font-size: 132px; margin-top: 10px;">Fisherman's Coast</div>
-  <div class="sub" id="titleTag" style="margin-top: 26px;">7 places, one for every shore</div>
 </div>
 
-<!-- 5-16 s: the seven places (the Cottage is the 1.x house, repaired; the other six are new) -->
+<!-- The seven places, each on its spoken name (the Cottage is the 1.x house, repaired; the other six are new) -->
 <div id="chip" class="el" style="top: 300px;"><div class="chip"><span>7 coastal places</span><span class="count" id="count">1/7</span></div></div>
-<div id="label" class="el" style="top: 1190px;">
+<div id="label" class="el" style="top: 1150px;">
   <div class="name" id="labelName">Name</div>
   <div class="where"><span class="dot" id="labelDot"></span><span id="labelWhere">where</span></div>
 </div>
 
-<!-- 16-18 s: Crab Pots -->
+<!-- Crab Pots -->
 <div id="pots" class="el" style="top: 330px;">
   <div class="kicker">New block</div>
   <div class="display gold" style="font-size: 170px; margin-top: 8px;">Crab Pots</div>
@@ -139,7 +152,7 @@ html, body { width: 1080px; height: 1920px; overflow: hidden; background: #000; 
 </div>
 <div id="potsFoot" class="el" style="top: 1300px;"><div class="pill">by biome · hopper-ready · 2× in rain</div></div>
 
-<!-- 18-19.5 s: bait -->
+<!-- Bait -->
 <div id="bait" class="el" style="top: 330px;">
   <div class="kicker">Add bait</div>
   <div class="display gold" style="font-size: 150px; margin-top: 8px;">Faster.<br>Luckier.</div>
@@ -150,34 +163,36 @@ html, body { width: 1080px; height: 1920px; overflow: hidden; background: #000; 
   <div class="tile" id="t3" style="--c:${C.ice}"><img src="${item('glow_bait')}"><div class="n">Glow Bait</div><div class="s">+ treasure</div></div>
 </div></div>
 
-<!-- 19.5-21 s: residents -->
+<!-- The residents -->
 <div id="trades" class="el" style="top: 330px;">
   <div class="kicker">6 named fishermen</div>
   <div class="display gold" style="font-size: 150px; margin-top: 8px;">Exclusive<br>trades</div>
 </div>
-<div id="tradesFoot" class="el" style="top: 1320px;"><div class="pill">pots · bait · nets · bottles</div></div>
 
-<!-- 21-22.5 s: Messages in a Bottle -->
+<!-- Messages in a Bottle -->
 <div id="bottle" class="el" style="top: 330px;">
   <div class="kicker">Messages in a bottle</div>
   <div class="display gold" style="font-size: 150px; margin-top: 8px;">Treasure<br>maps</div>
   <div class="sub" style="margin-top: 22px;">to sunken trawlers</div>
 </div>
 
-<!-- 22.5-26 s: the end card, which loops back into the first frame -->
+<!-- The end card, which loops back into the first frame -->
 <div id="end" class="el" style="top: 330px;">
-  <img class="iconimg" id="endIcon" src="${icon}" style="width: 270px; height: 270px;">
+  <img class="iconimg" id="endIcon" src="${icon}" style="width: 220px; height: 220px;">
   <div class="kicker" id="endKicker" style="margin-top: 40px;">Free Minecraft mod</div>
-  <div class="display gold" id="endName" style="font-size: 140px; margin-top: 12px;">Fisherman's<br>Coast</div>
+  <div class="display gold" id="endName" style="font-size: 124px; margin-top: 12px;">Fisherman's<br>Coast</div>
   <div class="rope" id="endRope"></div>
   <div id="endLoaders" style="display: flex; gap: 18px;"><span class="pill">Fabric</span><span class="pill">NeoForge</span><span class="pill">Forge</span></div>
   <div class="sub" id="endVersions" style="margin-top: 26px; font-size: 52px;">Minecraft 1.20.1 → 26.3</div>
-  <div class="cta" id="endCta" style="margin-top: 70px;">
+  <div class="cta" id="endCta" style="margin-top: 50px;">
     <svg width="56" height="56" viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z" fill="${C.deep}"/></svg>
-    Send this to your fishing duo
+    Send this to your fishing buddy
   </div>
   <div class="sub" id="endWhere" style="margin-top: 30px; font-size: 44px; color: ${C.sand};">CurseForge & Modrinth</div>
 </div>
+
+<!-- Burned-in captions, word-timed: black type on highlight boxes, the spoken word yellow -->
+<div id="caption" class="el"></div>
 
 <div id="flash"></div>
 </div>
@@ -228,6 +243,36 @@ const STILL = {
   bottle: { scale: 1.0, x: 0, y: -400, blur: 0, bright: 1 },      // the note in chat and the map, above the caption bar
 };
 
+// Every moment comes from the narration (timeline.json, written by plan.py).
+const K = Object.fromEntries(T.clips.map((c) => [c.name, c]));
+const DROP = K.lighthouse.start, TITLE = (T.sentences || {}).s03 || DROP + 1, MONT = K.cottage.start;
+const END = K.end.start, DUR = T.duration, LOOP = DUR - 0.16;
+const HOOK = (T.words || []).filter((w) => w.sid === 's01');
+const BIG = [DROP, MONT, K.pots.start, END];
+
+// Captions: 2-4 words per line, split at punctuation and pauses. The hook
+// and "Not anymore." are already big words on screen, so their sentences are not captioned twice.
+const CAPS = (() => {
+  const words = (T.words || []).filter((w) => w.sid !== 's01' && w.sid !== 's02');
+  const phrases = []; let cur = [];
+  words.forEach((w, i) => {
+    cur.push(w);
+    const n = words[i + 1];
+    if (!n || /[.,?!:;]$/.test(w.w) || n.s - w.e > 0.45 || n.sid !== w.sid) { phrases.push(cur); cur = []; }
+  });
+  const lines = [];
+  for (const ph of phrases) {
+    let k = Math.ceil(ph.length / 4);
+    for (;;) {
+      const parts = []; let i = 0;
+      for (let j = 0; j < k; j++) { const n = Math.floor(ph.length / k) + (j < ph.length % k ? 1 : 0); parts.push(ph.slice(i, i + n)); i += n; }
+      if (k >= ph.length || parts.every((p) => p.map((w) => w.w).join(' ').length <= 22)) { lines.push(...parts); break; }
+      k++;
+    }
+  }
+  return lines.map((l, i) => ({ words: l, start: l[0].s, end: Math.min(l[l.length - 1].e + 0.35, i + 1 < lines.length ? lines[i + 1][0].s : 1e9) }));
+})();
+
 window.renderFrame = async (t) => {
   const c = clipAt(t);
   const local = t - c.start, len = c.end - c.start;
@@ -246,7 +291,7 @@ window.renderFrame = async (t) => {
   }
   if (c.name === 'lighthouse' && local < 0.35) { const a = 18 * (1 - local / 0.35); dx = a * Math.sin(local * 90); dy = a * Math.cos(local * 70); }
   if (c.name === 'end') {
-    const out = prog(t, 25.7, 0.3);
+    const out = prog(t, DUR - 0.3, 0.3);
     scale = 1.06 - 0.06 * easeOut(out); blur = 22 * (1 - easeOut(out)); bright = 0.75 + 0.25 * out;
     $('veil').style.opacity = 0.55 * (1 - easeOut(out));
   } else {
@@ -258,46 +303,43 @@ window.renderFrame = async (t) => {
 
   // Flashes on the big beats.
   let flash = 0;
-  for (const b of [2.0, 5.0, 16.0, 22.5]) { const d = t - b; if (d >= 0 && d < 0.12) flash = Math.max(flash, 0.35 * (1 - d / 0.12)); }
+  for (const b of BIG) { const d = t - b; if (d >= 0 && d < 0.12) flash = Math.max(flash, 0.35 * (1 - d / 0.12)); }
   $('flash').style.opacity = flash;
 
   // Shades behind the text.
-  const topShade = (t >= 2.0 && t < 3.05) || (t >= 16.0 && t < 22.5) ? 1 : (t < 2.0 || t >= 25.85 ? 0.55 : (t >= 5.0 && t < 16.0 ? 0.6 : 0));
-  shade('shadeTop', topShade);
-  shade('shadeBottom', (t >= 3.0 && t < 16.0) || (t >= 16.0 && t < 22.5) ? 1 : 0);
+  const feature = t >= K.pots.start && t < END;
+  shade('shadeTop', (t >= DROP && t < TITLE) || feature ? 1 : (t < DROP || t >= LOOP ? 0.55 : (t >= MONT && t < K.pots.start ? 0.6 : 0)));
+  shade('shadeBottom', t >= TITLE && t < LOOP ? 1 : 0.6);
 
-  // 0-2: the hook (already on screen in the first frame), and again at the very end so the loop is seamless.
+  // The hook: "Minecraft beaches" from the first frame, "are" and "boring." on their spoken words; again at the very
+  // end, so the loop back to the first frame is seamless.
   const hook = $('hook');
-  const hookOn = t < 1.97 || t >= 25.84;
-  hook.style.opacity = hookOn ? 1 : 0;
-  const ht = t >= 25.84 ? t - 25.84 : t;
-  const words = [['w1', -1], ['w2', -1], ['w3', 0.5], ['w4', 1.0]];
-  for (const [id, at] of words) {
+  const ending = t >= LOOP;
+  hook.style.opacity = t < DROP || ending ? 1 : 0;
+  const at = (n, fallback) => (HOOK[n] ? HOOK[n].s : fallback);
+  const words = [['w1', -1], ['w2', -1], ['w3', at(2, 0.5)], ['w4', at(3, 1.0)]];
+  for (const [id, when] of words) {
     const w = $(id);
-    if (t >= 25.84) { const i = prog(ht, 0, 0.16); w.style.opacity = id === 'w1' || id === 'w2' ? i : 0; w.style.transform = 'scale(' + (0.6 + 0.4 * back(i)) + ')'; continue; }
-    if (at < 0) { w.style.opacity = 1; w.style.transform = 'scale(' + (1 + 0.04 * Math.sin(t * 6)) + ')'; continue; }
-    const i = prog(t, at, 0.2);
-    w.style.opacity = t < at ? 0 : 1;
+    if (ending) { const i = prog(t, LOOP, 0.14); w.style.opacity = when < 0 ? i : 0; w.style.transform = 'scale(' + (0.6 + 0.4 * back(i)) + ')'; continue; }
+    if (when < 0) { w.style.opacity = 1; w.style.transform = 'scale(' + (1 + 0.04 * Math.sin(t * 6)) + ')'; continue; }
+    const i = prog(t, when, 0.2);
+    w.style.opacity = t < when ? 0 : 1;
     w.style.transform = 'scale(' + (0.3 + 0.7 * back(i)) + ') rotate(' + (id === 'w4' ? -4 * back(i) : 0) + 'deg)';
   }
-  if (t >= 1.85 && t < 1.97) hook.style.transform = 'scale(' + (1 + 0.6 * easeIn(prog(t, 1.85, 0.12))) + ')';
+  if (t >= DROP - 0.12 && t < DROP) { const p = prog(t, DROP - 0.12, 0.12); hook.style.transform = 'scale(' + (1 + 0.6 * easeIn(p)) + ')'; hook.style.opacity = 1 - p; }
   else hook.style.transform = 'none';
-  if (t >= 1.85 && t < 1.97) hook.style.opacity = 1 - prog(t, 1.85, 0.12);
 
-  // 2-3: the turn.
-  pop($('turn'), t, 2.0, 3.0, { d: 0.25, from: 2.2, rot: -6, outD: 0.12 });
-
-  // 3-5: the title.
-  pop($('title'), t, 3.0, 5.0, { d: 0.01, from: 1, outD: 0.15 });
-  if (t >= 3.0 && t < 5.0) {
-    pop($('titleIcon'), t, 3.0, 5.0, { d: 0.3, from: 0, rot: -12, outD: 0.01 });
-    rise($('titleKicker'), t, 3.12, 5.0, { outD: 0.01 });
-    rise($('titleName'), t, 3.2, 5.0, { dy: 80, outD: 0.01 });
-    pop($('titleTag'), t, 3.5, 5.0, { from: 0.6, outD: 0.01 });
+  // The turn, then the title.
+  pop($('turn'), t, DROP, TITLE, { d: 0.25, from: 2.2, rot: -6, outD: 0.12 });
+  pop($('title'), t, TITLE, MONT, { d: 0.01, from: 1, outD: 0.15 });
+  if (t >= TITLE && t < MONT) {
+    pop($('titleIcon'), t, TITLE, MONT, { d: 0.3, from: 0, rot: -12, outD: 0.01 });
+    rise($('titleKicker'), t, TITLE + 0.12, MONT, { outD: 0.01 });
+    rise($('titleName'), t, TITLE + 0.2, MONT, { dy: 80, outD: 0.01 });
   }
 
-  // 5-16: the seven places.
-  rise($('chip'), t, 5.0, 16.0, { dy: -80, outD: 0.15 });
+  // The seven places.
+  rise($('chip'), t, MONT, K.pots.start, { dy: -80, outD: 0.15 });
   const place = T.clips.find((k) => k.place && t >= k.start && t < k.end);
   const label = $('label');
   if (place) {
@@ -323,36 +365,53 @@ window.renderFrame = async (t) => {
     label.style.opacity = 0;
   }
 
-  // 16-18: Crab Pots.
-  pop($('pots'), t, 16.0, 18.0, { d: 0.28, from: 0.5, dy: -40 });
-  rise($('potsFoot'), t, 16.5, 18.0);
-  // 18-19.5: bait.
-  pop($('bait'), t, 18.0, 19.5, { d: 0.25, from: 0.5 });
-  $('baitTiles').style.opacity = t >= 18.0 && t < 19.5 ? 1 - prog(t, 19.38, 0.12) : 0;
-  pop($('t1'), t, 18.15, 19.6, { from: 0, dy: 80, outD: 0.01 });
-  pop($('t2'), t, 18.4, 19.6, { from: 0, dy: 80, outD: 0.01 });
-  pop($('t3'), t, 18.65, 19.6, { from: 0, dy: 80, outD: 0.01 });
-  // 19.5-21: trades.
-  pop($('trades'), t, 19.5, 21.0, { d: 0.25, from: 0.5 });
-  rise($('tradesFoot'), t, 19.8, 21.0);
-  // 21-22.5: the bottle.
-  pop($('bottle'), t, 21.0, 22.5, { d: 0.25, from: 0.5 });
+  // Crab Pots, bait, trades, the bottle.
+  pop($('pots'), t, K.pots.start, K.pots.end, { d: 0.28, from: 0.5, dy: -40 });
+  rise($('potsFoot'), t, K.pots.start + 0.5, K.pots.end);
+  const B = K.bait;
+  pop($('bait'), t, B.start, B.end, { d: 0.25, from: 0.5 });
+  $('baitTiles').style.opacity = t >= B.start && t < B.end ? 1 - prog(t, B.end - 0.12, 0.12) : 0;
+  pop($('t1'), t, B.start + 0.15, B.end + 0.1, { from: 0, dy: 80, outD: 0.01 });
+  pop($('t2'), t, B.start + 0.4, B.end + 0.1, { from: 0, dy: 80, outD: 0.01 });
+  pop($('t3'), t, B.start + 0.65, B.end + 0.1, { from: 0, dy: 80, outD: 0.01 });
+  pop($('trades'), t, K.trades.start, K.trades.end, { d: 0.25, from: 0.5 });
+  pop($('bottle'), t, K.bottle.start, K.bottle.end, { d: 0.25, from: 0.5 });
 
-  // 22.5-26: the end card.
-  const endOn = t >= 22.5 && t < 25.85;
-  $('end').style.opacity = endOn ? 1 - prog(t, 25.6, 0.25) : 0;
-  $('end').style.transform = 'scale(' + (1 - 0.06 * easeIn(prog(t, 25.6, 0.25))) + ')';
+  // The end card.
+  const endOn = t >= END && t < LOOP;
+  $('end').style.opacity = endOn ? 1 - prog(t, DUR - 0.4, 0.25) : 0;
+  $('end').style.transform = 'scale(' + (1 - 0.06 * easeIn(prog(t, DUR - 0.4, 0.25))) + ')';
   if (endOn) {
-    pop($('endIcon'), t, 22.5, 26, { d: 0.35, from: 0, rot: -14, outD: 0.01 });
-    rise($('endKicker'), t, 22.65, 26, { outD: 0.01 });
-    rise($('endName'), t, 22.75, 26, { dy: 90, outD: 0.01 });
-    const r = easeOut(prog(t, 22.9, 0.3)); $('endRope').style.opacity = r; $('endRope').style.transform = 'scaleX(' + r + ')';
-    pop($('endLoaders'), t, 23.0, 26, { from: 0.4, outD: 0.01 });
-    rise($('endVersions'), t, 23.2, 26, { outD: 0.01 });
-    pop($('endCta'), t, 23.5, 26, { d: 0.3, from: 0.2, outD: 0.01 });
-    const wob = t > 23.8 ? 1 + 0.035 * Math.max(0, Math.sin((t - 23.8) * Math.PI * 2)) : null;
-    if (wob) $('endCta').style.transform = 'scale(' + wob + ')';
-    rise($('endWhere'), t, 23.8, 26, { outD: 0.01 });
+    pop($('endIcon'), t, END, DUR, { d: 0.35, from: 0, rot: -14, outD: 0.01 });
+    rise($('endKicker'), t, END + 0.15, DUR, { outD: 0.01 });
+    rise($('endName'), t, END + 0.25, DUR, { dy: 90, outD: 0.01 });
+    const r = easeOut(prog(t, END + 0.4, 0.3)); $('endRope').style.opacity = r; $('endRope').style.transform = 'scaleX(' + r + ')';
+    pop($('endLoaders'), t, END + 0.5, DUR, { from: 0.4, outD: 0.01 });
+    rise($('endVersions'), t, END + 0.7, DUR, { outD: 0.01 });
+    const cta = (T.sentences || {}).s11 || END + 1.0;
+    pop($('endCta'), t, cta, DUR, { d: 0.3, from: 0.2, outD: 0.01 });
+    if (t > cta + 0.3) $('endCta').style.transform = 'scale(' + (1 + 0.035 * Math.max(0, Math.sin((t - cta - 0.3) * Math.PI * 2))) + ')';
+    rise($('endWhere'), t, END + 1.0, DUR, { outD: 0.01 });
+  }
+
+  // Captions, with the spoken word lit.
+  const cap = $('caption');
+  const line = CAPS.find((l) => t >= l.start && t < l.end && t < LOOP - 0.05);
+  // Over the first-person bottle shot the caption sits higher, clear of the hotbar and the note in chat.
+  cap.style.top = c.name === 'bottle' ? '900px' : '1440px';
+  if (line) {
+    const key = line.start.toFixed(3);
+    if (cap.dataset.k !== key) {
+      cap.dataset.k = key;
+      cap.innerHTML = line.words.map((w) => '<span class="cw">' + w.w.replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</span>').join('');
+    }
+    const spans = cap.children;
+    line.words.forEach((w, i) => spans[i].classList.toggle('on', t >= w.s && t < (line.words[i + 1] ? line.words[i + 1].s : line.end)));
+    const i = prog(t, line.start, 0.12);
+    cap.style.opacity = i;
+    cap.style.transform = 'translateY(-50%) scale(' + (0.85 + 0.15 * back(i)) + ')';
+  } else {
+    cap.style.opacity = 0;
   }
 };
 </script></body></html>`;

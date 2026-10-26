@@ -2,11 +2,13 @@
 """Makes the reel's audio from scratch (no samples): an original 120 BPM track and sound effects, both timed from
 timeline.json so every cut lands on a beat.
 
-  python3 marketing/reel/audio.py      # writes build/music.wav, build/sfx.wav, build/mix.wav (48 kHz stereo)
+  python3 marketing/reel/audio.py      # build/music.wav, sfx.wav, mix.wav, voice_sfx.wav (48 kHz stereo)
 
 The track is a sea shanty in D minor for a pop beat: a plucked melody (Karplus-Strong strings), a pad, a bass, drums.
 It opens on C major with a riser, drops on D minor with the "Not anymore" cut, goes under water for the Sunken Trawler,
-and ends on the chord it starts on, so the reel loops cleanly. Needs numpy and scipy.
+and ends on the intro's picking, so the reel loops cleanly. With the narration (build/vo.wav, from plan.py) it also
+writes build/mix.wav (voice, music bed, effects) and build/voice_sfx.wav (voice and effects, for a trending track).
+Needs numpy and scipy.
 """
 from __future__ import annotations
 
@@ -61,6 +63,8 @@ class Bus:
         i = int(round(t * SR))
         if i >= N:
             return
+        if i < 0:   # starts before the reel: keep only what falls inside it
+            x, i = x[-i:], 0
         x = x * gain
         n = min(len(x), len(self.l) - i)
         self.l[i:i + n] += x[:n] * np.sqrt(0.5 * (1 - pan))
@@ -239,43 +243,48 @@ def reverb(x, seconds=1.4, mix=0.25):
 
 # The arrangement ----------------------------------------------------------------------------------------------------
 
-D, F, A, C, E, G, BB = 62, 65, 69, 60, 64, 67, 58
 CHORDS = {'Dm': [62, 65, 69], 'Bb': [58, 62, 65], 'F': [60, 65, 69], 'C': [60, 64, 67]}
 ROOTS = {'Dm': 38, 'Bb': 34, 'F': 41, 'C': 36}
-# Bar 0 is the intro on C (tension), the drop lands on D minor, the last bar returns to C for the loop.
-BARS = ['C'] + ['Dm', 'Bb', 'F', 'C'] * 3
 MOTIF = {
     'Dm': [(0, .75, 74), (.75, .25, 74), (1, .5, 72), (1.5, .5, 69), (2, 1, 74), (3, .5, 77), (3.5, .5, 76)],
     'Bb': [(0, .75, 74), (.75, .25, 72), (1, .5, 70), (1.5, .5, 69), (2, 1.5, 70), (3.5, .5, 72)],
     'F': [(0, .75, 72), (.75, .25, 72), (1, .5, 69), (1.5, .5, 65), (2, 1, 69), (3, .5, 72), (3.5, .5, 74)],
     'C': [(0, 1, 76), (1, .5, 74), (1.5, .5, 72), (2, 2, 67)],
 }
-UNDER = (14.0, 16.0)      # the Sunken Trawler: the track goes under water
-END = 22.5                # the end card: the beat stops on an impact
+CLIP = {c['name']: c for c in TL['clips']}
+DROP = CLIP['lighthouse']['start']                              # "Not anymore": the beat drops on D minor
+UNDER = (CLIP['trawler']['start'], CLIP['trawler']['end'])      # the Sunken Trawler: the track goes under water
+END = CLIP['end']['start']                                      # the end card: the beat stops on an impact
+# Bar 0 is the intro on C (tension) and ends on the drop; then D minor, B flat, F, C; the end returns to the intro's
+# picking, so the reel loops.
+FIRST = DROP - BAR
+BARS = ['C'] + (['Dm', 'Bb', 'F', 'C'] * 8)[:int((DUR - DROP) / BAR) + 1]
 
 
 def music():
     drums, keys, low, lead = Bus(), Bus(), Bus(), Bus()
     kicks = []
     for b, chord in enumerate(BARS):
-        t0 = b * BAR
+        t0 = FIRST + b * BAR
         full = b >= 1 and t0 < END
-        under = UNDER[0] <= t0 < UNDER[1]
-        # Pad and arpeggio everywhere; bass and drums in the full sections.
-        keys.add(pad(CHORDS[chord], BAR - 0.05, cutoff=1100 if b == 0 or t0 >= END - 0.5 else 2400), t0, 0.42)
-        if b == 0 or t0 >= 22.0:
+        tail = t0 >= END - BAR / 2
+        # Pad everywhere; the picked arpeggio in the intro and on the end card; bass, drums and melody in between.
+        keys.add(pad(CHORDS[chord], BAR - 0.05, cutoff=1100 if b == 0 or tail else 2400), t0, 0.42)
+        if b == 0 or tail:
             for i in range(16):
                 m = (CHORDS[chord] + [n + 12 for n in CHORDS[chord]])[i % 6] + 12
-                if t0 + i * BEAT / 4 >= DUR:
+                ti = t0 + i * BEAT / 4
+                if ti >= DUR:
                     break
-                keys.add(lp(pluck(m, 0.2, 0.3), 2500), t0 + i * BEAT / 4, 0.18 * (0.6 + 0.4 * (i % 4 == 0)),
-                         pan=0.4 * np.sin(i))
+                if ti >= 0 and (b == 0 or ti >= END):
+                    keys.add(lp(pluck(m, 0.2, 0.3), 2500), ti, 0.18 * (0.6 + 0.4 * (i % 4 == 0)), pan=0.4 * np.sin(i))
         if not full:
             continue
         for beat in range(4):
             tb = t0 + beat * BEAT
             if tb >= END:
                 break
+            under = UNDER[0] <= tb < UNDER[1]
             if not under or beat % 2 == 0:
                 drums.add(kick(muffled=under), tb, 0.7)
                 kicks.append(tb)
@@ -283,24 +292,22 @@ def music():
                 drums.add(clap(), tb, 0.55)
             if not under:
                 drums.add(hat(), tb + BEAT / 2, 0.24, pan=0.3)
-                if b >= 8:
+                if tb >= UNDER[1]:
                     drums.add(hat(), tb + BEAT / 4, 0.08, pan=-0.3)
                     drums.add(hat(), tb + 3 * BEAT / 4, 0.08, pan=-0.3)
             for half in range(2):
                 low.add(bass(ROOTS[chord] + (12 if half else 0), BEAT / 2 - 0.03), tb + half * BEAT / 2, 0.3)
-        if not under:
-            octave = 12 if b >= 8 else 0
-            for at, d, m in MOTIF[chord]:
-                tm = t0 + at * BEAT
-                if tm >= END:
-                    break
-                note = pluck(m + octave, d * BEAT, 0.7)
-                lead.add(note, tm, 0.7, pan=-0.15)
-                lead.add(pluck(m + octave - 12, d * BEAT, 0.4), tm + 0.012, 0.3, pan=0.2)
-                if b >= 8:
-                    third = m + octave - (3 if m % 12 in (2, 9) else 4)   # a third below: minor on D and A
-                    lead.add(pluck(third, d * BEAT, 0.5), tm + 0.006, 0.22, pan=0.35)
-    for t in (2.0, 16.0):
+        octave = 12 if t0 >= UNDER[1] else 0
+        for at, d, m in MOTIF[chord]:
+            tm = t0 + at * BEAT
+            if tm >= END or UNDER[0] <= tm < UNDER[1]:
+                continue
+            lead.add(pluck(m + octave, d * BEAT, 0.7), tm, 0.7, pan=-0.15)
+            lead.add(pluck(m + octave - 12, d * BEAT, 0.4), tm + 0.012, 0.3, pan=0.2)
+            if octave:
+                third = m + octave - (3 if m % 12 in (2, 9) else 4)   # a third below: minor on D and A
+                lead.add(pluck(third, d * BEAT, 0.5), tm + 0.006, 0.22, pan=0.35)
+    for t in (DROP, UNDER[1]):
         drums.add(crash(), t, 0.5)
 
     # Sidechain: pad and bass duck under each kick (the "pump").
@@ -309,10 +316,11 @@ def music():
     for k in kicks:
         i = int(k * SR)
         m = min(N - i, int(0.3 * SR))
-        duck[i:i + m] = np.minimum(duck[i:i + m], 1 - 0.55 * np.exp(-tt[:m] / 0.09))
+        if m > 0:
+            duck[i:i + m] = np.minimum(duck[i:i + m], 1 - 0.55 * np.exp(-tt[:m] / 0.09))
     keys_s, low_s = keys.stereo() * duck, low.stereo() * duck
     lead_s = lead.stereo()
-    # A dotted-eighth echo on the lead, panned.
+    # A dotted-eighth echo on the melody, panned.
     delay = int(0.75 * BEAT * SR)
     echo = np.zeros_like(lead_s)
     echo[0, delay:] = lead_s[1, :-delay] * 0.28
@@ -324,26 +332,35 @@ def music():
     return mix * (1 - w) + wet * w
 
 
+def word_time(sid, n):
+    ws = [w for w in TL.get('words', []) if w['sid'] == sid]
+    return ws[n]['s'] if len(ws) > n else None
+
+
 def sfx():
     s = Bus()
-    s.add(riser(1.5), 0.5, 0.35)
-    s.add(boom(), 2.0, 0.9)
+    rise = min(1.5, DROP - 0.1)
+    s.add(riser(rise), DROP - rise, 0.35)
+    s.add(boom(), DROP, 0.9)
     s.add(boom(), END, 0.8)
     s.add(chime(), END + 0.02, 0.25)
-    for t in (0.5, 1.0):
-        s.add(pop(), t, 0.35)
-    cuts = [c['start'] for c in TL['clips'] if c['start'] not in (0.0, 2.0)]
-    for t in cuts:
-        s.add(whoosh(0.28), t - 0.22, 0.18 if t != END else 0.3, pan=0.2 * np.sin(t))
+    for n in (2, 3):                      # "are", "boring" pop in on their words
+        t = word_time('s01', n)
+        if t is not None:
+            s.add(pop(), t, 0.35)
     for c in TL['clips']:
+        if c['start'] > DROP and c['name'] != 'end':   # the end card comes in on its impact instead
+            s.add(whoosh(0.28), c['start'] - 0.22, 0.18, pan=0.2 * np.sin(c['start']))
         if c.get('place'):
             s.add(tick(), c['start'] + 0.04, 0.22)
-    s.add(pop(), 3.0, 0.3)
-    for t in (18.15, 18.4, 18.65, 23.5):
-        s.add(pop(), t, 0.28)
-    s.add(bubbles(2.0), UNDER[0], 0.12)
-    s.add(bubbles(1.8, rate=8), 16.0, 0.07)
-    s.add(clink(), 21.0, 0.2)
+    s.add(pop(), TL['sentences'].get('s03', DROP + 1.0), 0.3)
+    bait = CLIP['bait']['start']
+    for d in (0.15, 0.4, 0.65):
+        s.add(pop(), bait + d, 0.28)
+    s.add(pop(), END + 1.0, 0.28)
+    s.add(bubbles(UNDER[1] - UNDER[0]), UNDER[0], 0.06)
+    s.add(bubbles(CLIP['pots']['end'] - CLIP['pots']['start'], rate=8), CLIP['pots']['start'], 0.035)
+    s.add(clink(), CLIP['bottle']['start'], 0.2)
     return reverb(s.stereo(), 1.0, 0.18)
 
 
@@ -354,6 +371,28 @@ def master(x, peak=0.89):
     x[:, :f] *= np.linspace(0, 1, f)
     x[:, -f:] *= np.linspace(1, 0, f)
     return x * peak
+
+
+def rms(x):
+    return float(np.sqrt(np.mean(x ** 2)) + 1e-9)
+
+
+def narrated(vo, music_bed, effects):
+    """The voice on top; the music as a bed 9 dB under it, ducked 7 dB more while the voice speaks; the effects well
+    under the voice (their peaks 11 dB below its peak), ducked while it speaks."""
+    vo = vo / np.max(np.abs(vo))
+    win = int(0.25 * SR)
+    env = np.convolve(np.abs(vo), np.ones(win) / win, mode='same')
+    duck = np.where(env > 0.008, 10 ** (-7 / 20), 1.0)
+    duck = np.convolve(duck, np.ones(win) / win, mode='same')
+    speaking = env > 0.008
+    voice_level = rms(vo[speaking]) if speaking.any() else rms(vo)
+    bed = music_bed / rms(music_bed) * voice_level * 10 ** (-9 / 20) if music_bed is not None else 0
+    fx = effects / np.max(np.abs(effects)) * 10 ** (-11 / 20)
+    # The effects step aside for the voice too (6 dB while it speaks), so no word is masked by a whoosh or an impact.
+    fx_duck = np.convolve(np.where(env > 0.008, 10 ** (-6 / 20), 1.0), np.ones(win) / win, mode='same')
+    out = np.stack([vo, vo]) + bed * duck + fx * fx_duck
+    return out / np.max(np.abs(out)) * 0.89
 
 
 def write(name, x):
@@ -367,4 +406,12 @@ if __name__ == '__main__':
     e = sfx()
     write('music.wav', master(m))
     write('sfx.wav', master(e, 0.7))
-    write('mix.wav', master(m / np.max(np.abs(m)) + 0.55 * e / np.max(np.abs(e))))
+    vo_path = BUILD / 'vo.wav'
+    if vo_path.exists():
+        rate, vo = wavfile.read(vo_path)
+        vo = (vo.astype(np.float64) / (32768 if vo.dtype == np.int16 else 1))[:N]
+        vo = np.pad(vo, (0, N - len(vo)))
+        write('mix.wav', narrated(vo, m, e))
+        write('voice_sfx.wav', narrated(vo, None, e))
+    else:
+        write('mix.wav', master(m / np.max(np.abs(m)) + 0.55 * e / np.max(np.abs(e))))

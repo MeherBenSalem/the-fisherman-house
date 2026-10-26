@@ -14,6 +14,7 @@ Every structure is where the world generated it; nothing in the pictures is edit
 from __future__ import annotations
 
 import argparse
+import json
 import math
 import re
 import shutil
@@ -30,6 +31,21 @@ from marketing_shots import box_of  # noqa: E402
 NS = 'fisherman_house'
 FPS = 30
 OUT = ROOT / 'marketing' / 'reel' / 'build' / 'frames'
+TIMELINE = json.loads((Path(__file__).resolve().parent / 'timeline.json').read_text())
+
+
+def length(name):
+    """How long a clip runs in the edit (timeline.json, timed to the narration by plan.py), plus two spare frames."""
+    clip = next(c for c in TIMELINE['clips'] if c['name'] == name)
+    return clip['end'] - clip['start'] + 2 / FPS
+
+
+def same(a, b, threshold=0.05):
+    """Whether two captures show the same picture (mean grey-level difference on a small copy)."""
+    import numpy as np
+    from PIL import Image
+    x, y = (np.asarray(Image.open(p).convert('L').resize((135, 240)), dtype=float) for p in (a, b))
+    return float(np.abs(x - y).mean()) < threshold
 
 
 def ease(t):
@@ -80,7 +96,7 @@ class Reel:
         self.s.cmd(f'gamemode spectator {PLAYER}', 'weather clear', 'gamerule advance_time false',
                    'gamerule advance_weather false')
 
-    def clip(self, name, seconds, path, settle=14, wait=0.45):
+    def clip(self, name, seconds, path, settle=14, wait=0.55):
         frames = round(seconds * FPS)
         out = OUT / name
         shutil.rmtree(out, ignore_errors=True)
@@ -96,6 +112,13 @@ class Reel:
                 self.s.cmd('tick step 1')
                 time.sleep(wait)
             self.s.shot(out / f'{i:04d}.jpg')
+            # A frame identical to the one before means the game had not drawn the new camera position yet (a visible
+            # stutter): wait and take it again.
+            for _ in range(6):
+                if n == 0 or self.preview or not same(out / f'{i:04d}.jpg', out / f'{indices[n - 1]:04d}.jpg'):
+                    break
+                time.sleep(0.4)
+                self.s.shot(out / f'{i:04d}.jpg')
         self.s.cmd('tick unfreeze')
         if self.preview:
             sheet = OUT.parent / f'preview-{name}.jpg'
@@ -122,20 +145,20 @@ def beach(r: Reel):
     r.s.cmd('forceload remove all', 'time set 3000', 'effect clear ' + PLAYER)
     x, z = BEACH
     r.s.cmd(f'forceload add {x - 64} {z - 64} {x + 64} {z + 64}')
-    r.clip('beach', 2.0, dolly((x - 2, 70, z + 8), (x + 1, 68.2, z - 3), (x - 6, 63, z - 40), (x - 2, 62.5, z - 44),
+    r.clip('beach', length('beach'), dolly((x - 2, 70, z + 8), (x + 1, 68.2, z - 3), (x - 6, 63, z - 40), (x - 2, 62.5, z - 44),
                                 curve=ease_in))
 
 
 def lighthouse(r: Reel):
     box, c, span = r.place('lighthouse', 12800)
-    r.clip('lighthouse', 3.0, orbit(c, 250, 290, span * 1.7 + 6, span * 1.05 + 6, box[4] - c[1] + 6, box[4] - c[1] - 4,
+    r.clip('lighthouse', length('lighthouse'), orbit(c, 250, 290, span * 1.7 + 6, span * 1.05 + 6, box[4] - c[1] + 6, box[4] - c[1] - 4,
                                     look_up=2, curve=ease_out))
 
 
 def lighthouse_day(r: Reel):
     box, c, span = r.place('lighthouse', 6000)
     top = box[4] - c[1]
-    r.clip('lighthouse_day', 1.5, orbit(c, 110, 150, span * 1.0 + 6, span * 0.8 + 6, top + 3, top - 1,
+    r.clip('lighthouse_day', length('lighthouse_day'), orbit(c, 110, 150, span * 1.0 + 6, span * 0.8 + 6, top + 3, top - 1,
                                         look_up=3, curve=cruise))
 
 
@@ -146,36 +169,36 @@ def cottage(r: Reel):
     pos = r.s.cmd(f'data get entity @e[type=minecraft:villager,x={x1},y={y1},z={z1},dx={x2 - x1},dy={y2 - y1},'
                   f'dz={z2 - z1},limit=1] Pos')
     house = tuple(float(v) for v in re.findall(r'(-?[\d.]+)d', pos)[:3])
-    r.clip('cottage', 1.5, orbit(house, 60, 100, 26, 20, 12, 8, look_up=-1, curve=cruise))
+    r.clip('cottage', length('cottage'), orbit(house, 60, 100, 26, 20, 12, 8, look_up=-1, curve=cruise))
 
 
 def pier(r: Reel):
     box, c, span = r.place('harbour_pier', 1500)
-    r.clip('pier', 1.5, orbit(c, 70, 110, span * 0.9 + 6, span * 0.7 + 6, box[4] - c[1] + 5, box[4] - c[1] + 1,
+    r.clip('pier', length('pier'), orbit(c, 70, 110, span * 0.9 + 6, span * 0.7 + 6, box[4] - c[1] + 5, box[4] - c[1] + 1,
                                   curve=cruise))
 
 
 def stilt(r: Reel):
     box, c, span = r.place('stilt_shack', 6000)
-    r.clip('stilt', 1.5, orbit(c, 70, 110, span * 1.2 + 6, span * 0.9 + 6, box[4] - c[1] + 4, box[4] - c[1],
+    r.clip('stilt', length('stilt'), orbit(c, 70, 110, span * 1.2 + 6, span * 0.9 + 6, box[4] - c[1] + 4, box[4] - c[1],
                                    curve=cruise))
 
 
 def ice(r: Reel):
     box, c, span = r.place('ice_fishing_camp', 5000)
-    r.clip('ice', 1.5, orbit(c, 250, 290, span * 1.3 + 6, span * 1.0 + 6, box[4] - c[1] + 5, box[4] - c[1] + 2,
+    r.clip('ice', length('ice'), orbit(c, 250, 290, span * 1.3 + 6, span * 1.0 + 6, box[4] - c[1] + 5, box[4] - c[1] + 2,
                                  curve=cruise))
 
 
 def boathouse(r: Reel):
     box, c, span = r.place('river_boathouse', 2000)
-    r.clip('boathouse', 1.5, orbit(c, 70, 110, span * 1.1 + 6, span * 0.85 + 6, box[4] - c[1] + 4, box[4] - c[1] + 1,
+    r.clip('boathouse', length('boathouse'), orbit(c, 70, 110, span * 1.1 + 6, span * 0.85 + 6, box[4] - c[1] + 4, box[4] - c[1] + 1,
                                        curve=cruise))
 
 
 def trawler(r: Reel):
     box, c, span = r.place('sunken_trawler', 6000, underwater=True)
-    r.clip('trawler', 2.0, orbit(c, 160, 205, span * 0.75 + 4, span * 0.55 + 4, 9, 6, look_up=-2, curve=cruise),
+    r.clip('trawler', length('trawler'), orbit(c, 160, 205, span * 0.75 + 4, span * 0.55 + 4, 9, 6, look_up=-2, curve=cruise),
            settle=40)
 
 
@@ -202,7 +225,7 @@ def pots(r: Reel):
     cz = sum(p[1] for p in near) / 3 + 0.5
     r.s.cmd(f'effect give {PLAYER} minecraft:night_vision 900 0 true',
             f'effect give {PLAYER} minecraft:conduit_power 900 0 true')
-    r.clip('pots', 2.0, dolly((cx + 4.6, 60.4, cz + 4.6), (cx + 2.4, 60.0, cz + 2.4), (cx, 61.4, cz), (cx, 61.2, cz),
+    r.clip('pots', length('pots'), dolly((cx + 4.6, 60.4, cz + 4.6), (cx + 2.4, 60.0, cz + 2.4), (cx, 61.4, cz), (cx, 61.2, cz),
                             curve=cruise), settle=40)
 
 
