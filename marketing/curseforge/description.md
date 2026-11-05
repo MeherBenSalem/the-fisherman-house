@@ -1,6 +1,10 @@
 ![Fisherman's Coast](https://raw.githubusercontent.com/MeherBenSalem/the-fisherman-house/main/marketing/images/banner.png)
 
-**A whole coastline worth visiting.** Seven fishing places, each built for its own kind of shore and placed only where
+**[Discord](https://discord.gg/TJc3CxR4jK) · [The modpack](https://www.curseforge.com/minecraft/modpacks/remnants-ashen-legacy) · [Support NightBeam](https://nightbeam.dev/support) · [NightBeam Pro](https://nightbeam.dev/memberships) · [All projects](https://nightbeam.dev/projects)**
+
+> **Featured in [Remnants: Ashen Legacy](https://www.curseforge.com/minecraft/modpacks/remnants-ashen-legacy)**, NightBeam's story-driven soulslike RPG modpack.
+
+**A whole coastline worth visiting.** Seven fishing places, each built for its own kind of shore and placed just where
 the land suits it: a harbour pier on the beach, a lighthouse on the rocks, a stilt shack in the swamp, an ice fishing
 camp on a frozen sea, a boathouse on the river and a sunken trawler on the ocean floor, plus the original Fisherman's
 House, repaired. Each one has a named fisherman with his own trades. Set **Crab Pots** that fish while you are away,
@@ -104,7 +108,7 @@ out, and the bottle holds either a small treasure or a **map to the nearest Sunk
 
 ![Your coast, your rules](https://raw.githubusercontent.com/MeherBenSalem/the-fisherman-house/main/marketing/images/card-config.png)
 
-- `config/fisherman_house.json` is written on first start, with comments: Crab Pot timing, the water it needs, the
+- `config/fisherman_house.json` is written at startup, with comments: Crab Pot timing, the water it needs, the
   rain bonus, and an on/off switch for each structure.
 - Biomes, spacing, loot, Crab Pot catches, bottle contents and the shore rules are datapack data.
 - `/locate structure #fisherman_house:coastal` finds the nearest of any of them; operators can run
@@ -143,4 +147,14 @@ datapack, or switch it off in the config.
 
 ![divider](https://raw.githubusercontent.com/MeherBenSalem/the-fisherman-house/main/marketing/images/divider.png)
 
-[Discord](https://discord.gg/SAmd9fhNhr) · [Source and issues](https://github.com/MeherBenSalem/the-fisherman-house) · [Support us](https://nightbeam.dev/support) · Made by NightBeam Studio
+---
+
+### More from NightBeam Studio
+
+- **[Remnants: Ashen Legacy](https://www.curseforge.com/minecraft/modpacks/remnants-ashen-legacy)**: the story-driven soulslike RPG modpack built on NightBeam's mods
+- **[Premium server plugins](https://nightbeam.dev/store)**: anti-cheat, ranked PvP, SMP setups and more on BuiltByBit
+- **[NightBeam Pro](https://nightbeam.dev/memberships)**: the model library and NightBeam Forge credits, from $5 a month
+- **[Discord](https://discord.gg/TJc3CxR4jK)**: support, bug reports, suggestions and early looks
+- **[Support NightBeam](https://nightbeam.dev/support)**: help keep every mod free
+
+**Follow:** [YouTube](https://www.youtube.com/@nightbeamstudio) · [Instagram](https://www.instagram.com/nightbeamstudio/) · [X](https://x.com/NightBeamLLC) · [Facebook](https://www.facebook.com/profile.php?id=61574823331471) · [Source and issues](https://github.com/MeherBenSalem/the-fisherman-house)
