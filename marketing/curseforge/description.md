@@ -1,6 +1,6 @@
 ![Fisherman's Coast](https://raw.githubusercontent.com/MeherBenSalem/the-fisherman-house/main/marketing/images/banner.png)
 
-**[Discord](https://discord.gg/TJc3CxR4jK) · [Source and issues](https://github.com/MeherBenSalem/the-fisherman-house)**
+**[Docs](https://nightbeam.dev/docs/fishermans-coast) · [Discord](https://discord.gg/TJc3CxR4jK) · [Source and issues](https://github.com/MeherBenSalem/the-fisherman-house)**
 
 **A whole coastline worth visiting.** Seven fishing places, each built for its own kind of shore and placed just where
 the land suits it: a harbour pier on the beach, a lighthouse on the rocks, a stilt shack in the swamp, an ice fishing
