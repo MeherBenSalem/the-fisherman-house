@@ -8,7 +8,7 @@ camp on a frozen sea, a boathouse on the river and a sunken trawler on the ocean
 House, repaired. Each one has a named fisherman with his own trades. Set **Crab Pots** that fish while you are away,
 bait them, hang **Fishing Nets**, and open **Messages in a Bottle** that lead to the treasure in a wreck.
 
-Fabric and NeoForge (Forge on 1.20.1) · Minecraft 1.20.1, 1.21.1, 26.1.2, 26.2 and 26.3 · install on the server and
+Fabric and NeoForge (Forge on 1.20.1) · Minecraft 1.20.1, 1.21.1, 26.2 and 26.3 · install on the server and
 clients · Fabric needs Fabric API, nothing else is needed
 
 Formerly **The Fisherman House**: same mod id, and your worlds keep loading.
@@ -121,7 +121,6 @@ Pick the file that matches **both** your Minecraft version and your loader:
 |-----------|---------------------------|------------------|
 | 1.20.1 | `fisherman_house-fabric-1.20.1-2.0.0.jar` | `fisherman_house-forge-1.20.1-2.0.0.jar` (Forge 47.4.0+) |
 | 1.21.1 | `fisherman_house-fabric-1.21.1-2.0.0.jar` | `fisherman_house-neoforge-1.21.1-2.0.0.jar` (NeoForge 21.1.219+) |
-| 26.1.2 | `fisherman_house-fabric-26.1.2-2.0.0.jar` | `fisherman_house-neoforge-26.1.2-2.0.0.jar` (NeoForge 26.1.2.7-beta+) |
 | 26.2 | `fisherman_house-fabric-26.2-2.0.0.jar` | `fisherman_house-neoforge-26.2-2.0.0.jar` (NeoForge 26.2.0.93+) |
 | 26.3 | `fisherman_house-fabric-26.3-2.0.0.jar` | `fisherman_house-neoforge-26.3-2.0.0.jar` (NeoForge 26.3.0.97+) |
 
@@ -142,6 +141,8 @@ in a Bottle and follow the map to a Sunken Trawler.
 datapack, or switch it off in the config.
 
 **Forge on 1.21.1?** There is no Forge build for 1.21.1 any more; use the NeoForge or Fabric jar.
+
+**Which Minecraft versions?** 1.20.1 (Fabric, Forge) and 1.21.1, 26.2 and 26.3 (Fabric, NeoForge).
 
 ![divider](https://raw.githubusercontent.com/MeherBenSalem/the-fisherman-house/main/marketing/images/divider.png)
 

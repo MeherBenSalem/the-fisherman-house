@@ -1,14 +1,26 @@
-# Publishes the release jars in releases/ to Modrinth and CurseForge.
+# Publish Fisherman's Coast to Modrinth + CurseForge (NightBeam convention).
 #
-# Jars are never built here: the jars in releases/ are the ones that went through in-game QA (docs/QA-<version>.md).
-# They are named fisherman_house-{loader}-{minecraft}-{version}.jar; the loader and Minecraft version are read from the
-# name and checked against the metadata inside each jar.
+# Runs only by hand (workflow_dispatch) or on a v*.*.* tag; a push to main never releases anything.
+# Uses exactly the 8 convention jars for the version, in this order of sources:
+#   1. releases/fisherman_house-<loader>-<minecraft>-<version>.jar committed to the repo (the jars that went through
+#      in-game QA, docs/QA-<version>.md),
+#   2. the jars attached to the GitHub Release v<version>,
+#   3. a build from source: ./gradlew buildAll (the workspaces must be at <version>).
+# The run fails unless all 8 are found: 1.20.1 Fabric + Forge; 1.21.1, 26.2 and 26.3 Fabric + NeoForge. The loader and
+# Minecraft version are read from each jar name (.github/scripts/detect-jar-meta.js) and checked against the metadata
+# inside the jar.
 #
-# Secrets:   MODRINTH_TOKEN, CURSEFORGE_TOKEN, CURSEFORGE_API_KEY (optional: lets a rerun skip files already on CurseForge)
-# Variables: MODRINTH_ID, CURSEFORGE_ID (secrets with these names work too; default: this mod's projects)
+# Same-day guard (NightBeam convention): scripts/same_day_guard.mjs stops the run if this mod already had a
+# release today (Africa/Tunis day), on Modrinth, CurseForge or an earlier Publish run. A dry run only reports it.
+# It runs before building and again right before the upload, whatever the inputs below say.
 #
-# Run it from the Actions tab (workflow_dispatch) or push a tag: git tag v2.0.0 && git push origin v2.0.0
-# Re-running is safe: versions that already exist on a platform are skipped.
+# Repo secrets: MODRINTH_TOKEN, CURSEFORGE_TOKEN, CURSEFORGE_API_KEY (also lets a rerun skip files already on CurseForge)
+# Repo variables: MODRINTH_ID (Dku9hJfB), CURSEFORGE_ID (1388089). Until the variables exist, the old MODRINTH_ID /
+# CURSEFORGE_ID secrets are still read, and then these IDs, so the guard and the upload always target this mod.
+#
+# Prove it first:  gh workflow run publish.yml -f version=2.0.1 -f dry_run=true
+# Release:         gh workflow run publish.yml -f version=2.0.1   (or: git tag v2.0.1 && git push origin v2.0.1)
+# Re-running is safe: versions that already exist on a platform are skipped (but the same-day guard still applies).
 
 name: Publish
 
@@ -22,82 +34,167 @@ on:
         description: "Version to publish, without v (default: the version in the workspaces' gradle.properties)"
         required: false
       dry_run:
-        description: "Check everything but upload nothing"
-        type: boolean
-        default: false
+        description: "Skip uploads if true (check everything, upload nothing)"
+        type: choice
+        options: ["false", "true"]
+        default: "false"
       platforms:
-        description: "Where to upload"
+        description: "Where to upload (the same-day guard still applies)"
         type: choice
         options: [both, modrinth, curseforge]
         default: both
       minecraft_version:
-        description: "Only upload the jars for this Minecraft version (e.g. 26.2); empty for all"
+        description: "Optional: upload only this Minecraft version's jars (1.20.1, 1.21.1, 26.2 or 26.3); the same-day guard still applies"
         required: false
       update_listing:
         description: "Also update the Modrinth description, summary and icon from marketing/"
-        type: boolean
-        default: false
+        type: choice
+        options: ["false", "true"]
+        default: "false"
 
-permissions:
-  contents: read
-
+# One Publish at a time per repo, so two runs can't both pass the same-day guard.
 concurrency:
-  group: publish
+  group: publish-${{ github.repository }}
   cancel-in-progress: false
 
 jobs:
   publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-    env:
-      # Every build this repository ships; a release must contain all of them.
-      EXPECTED_BUILDS: >-
-        fabric:1.20.1 forge:1.20.1 fabric:1.21.1 neoforge:1.21.1 fabric:26.1.2 neoforge:26.1.2
-        fabric:26.2 neoforge:26.2 fabric:26.3 neoforge:26.3
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      actions: read
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-
-      - name: Test the jar name parser
-        run: node .github/scripts/detect-jar-meta.test.js
-
       - name: Resolve and check the version
         id: ver
         shell: bash
         env:
-          REF: ${{ github.ref }}
-          REF_NAME: ${{ github.ref_name }}
           INPUT_VERSION: ${{ inputs.version }}
         run: |
           set -euo pipefail
-          declared=$(grep -h '^version=' */gradle.properties | cut -d= -f2 | sort -u)
-          if [ "$(printf '%s\n' "$declared" | wc -l)" -ne 1 ]; then
-            echo "The workspaces declare different versions: $declared" >&2; exit 1
-          fi
-          if [[ "$REF" == refs/tags/v* ]]; then
-            version="${REF_NAME#v}"
+          declared="$(python3 scripts/check_targets.py version)"
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            version="${GITHUB_REF_NAME#v}"
           elif [ -n "$INPUT_VERSION" ]; then
-            version="$INPUT_VERSION"
+            version="${INPUT_VERSION#v}"
           else
             version="$declared"
           fi
           if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "Not a release version: '$version'" >&2; exit 1
+            echo "::error::Not a release version: '$version'"; exit 1
           fi
           if [ "$version" != "$declared" ]; then
-            echo "Version $version does not match gradle.properties ($declared)" >&2; exit 1
+            echo "::error::Version $version does not match the workspaces' gradle.properties ($declared)"; exit 1
           fi
           if [ ! -f "patchnotes/$version.md" ]; then
-            echo "Missing patchnotes/$version.md" >&2; exit 1
+            echo "::error::Missing patchnotes/$version.md (the changelog sent to both sites)"; exit 1
           fi
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
-      - name: Find and verify the release jars
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Test publisher scripts
+        run: |
+          node --test scripts/*.test.mjs
+          node .github/scripts/detect-jar-meta.test.js
+
+      - name: Same-day guard
+        env:
+          MODRINTH_ID: ${{ vars.MODRINTH_ID || secrets.MODRINTH_ID || 'Dku9hJfB' }}
+          CURSEFORGE_ID: ${{ vars.CURSEFORGE_ID || secrets.CURSEFORGE_ID || '1388089' }}
+          CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
+          GITHUB_TOKEN: ${{ github.token }}
+          PUBLISH_WORKFLOW: publish.yml
+          UPLOAD_STEP: Upload Modrinth + CurseForge
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: node scripts/same_day_guard.mjs
+
+      - name: Find prebuilt release jars
+        id: prebuilt
+        shell: bash
+        env:
+          VERSION: ${{ steps.ver.outputs.version }}
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          # Only the 8 convention names are ever picked up; anything else in releases/ (older versions, dropped
+          # targets such as 26.1.2) is ignored.
+          mapfile -t NAMES < <(python3 -c 'import sys; sys.path.insert(0, "scripts"); import check_targets as c; print("\n".join(sorted(c.expected_names(sys.argv[1]))))' "$VERSION")
+          found=0
+          for name in "${NAMES[@]}"; do
+            if [ -f "releases/$name" ]; then
+              cp -f "releases/$name" dist/
+              found=$((found + 1))
+            fi
+          done
+          if [ "$found" -gt 0 ]; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+            echo "Using $found prebuilt jar(s) from releases/"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            echo "No convention jars for ${VERSION} in releases/; will try the GitHub Release, then build from source"
+          fi
+
+      - name: Download GitHub release jars
+        id: ghrelease
+        if: steps.prebuilt.outputs.found != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.ver.outputs.version }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          patterns=()
+          while IFS= read -r name; do patterns+=(--pattern "$name"); done < <(python3 -c 'import sys; sys.path.insert(0, "scripts"); import check_targets as c; print("\n".join(sorted(c.expected_names(sys.argv[1]))))' "$VERSION")
+          if gh release view "v${VERSION}" --repo "$REPO" >/dev/null 2>&1; then
+            gh release download "v${VERSION}" --repo "$REPO" --dir dist --clobber "${patterns[@]}" || true
+          fi
+          count=$(find dist -maxdepth 1 -name 'fisherman_house-*.jar' | wc -l)
+          if [ "$count" -gt 0 ]; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+            echo "Using $count jar(s) from GitHub Release v${VERSION}"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            echo "No GitHub Release jars for v${VERSION}; building from source"
+          fi
+
+      # 21 stays JAVA_HOME (Gradle for 1.20.1/1.21.1); 17 is the 1.20.1 toolchain; the root build hands 26.x
+      # JAVA_HOME_25_X64.
+      - uses: actions/setup-java@v4
+        if: steps.prebuilt.outputs.found != 'true' && steps.ghrelease.outputs.found != 'true'
+        with:
+          distribution: temurin
+          java-version: |
+            17
+            25
+            21
+
+      - uses: gradle/actions/setup-gradle@v4
+        if: steps.prebuilt.outputs.found != 'true' && steps.ghrelease.outputs.found != 'true'
+
+      - name: Build from source
+        if: steps.prebuilt.outputs.found != 'true' && steps.ghrelease.outputs.found != 'true'
+        shell: bash
+        env:
+          VERSION: ${{ steps.ver.outputs.version }}
+        run: |
+          set -euo pipefail
+          python3 scripts/check_targets.py workspaces
+          chmod +x gradlew 1.20.1/gradlew 1.21.1/gradlew 26.2/gradlew 26.3/gradlew
+          ./gradlew buildAll --no-daemon
+          python3 scripts/check_targets.py jars --version "$VERSION" --dir releases --list-file built-jars.txt
+          mkdir -p dist
+          xargs -a built-jars.txt cp -f -t dist/
+
+      - name: Verify release jars
         id: jars
         shell: bash
         env:
@@ -105,33 +202,58 @@ jobs:
           MC_FILTER: ${{ inputs.minecraft_version }}
         run: |
           set -euo pipefail
-          if [ -n "$MC_FILTER" ] && ! [[ "$MC_FILTER" =~ ^[0-9]+(\.[0-9]+){1,2}$ ]]; then
-            echo "Not a Minecraft version: '$MC_FILTER'" >&2; exit 1
-          fi
-          list=$(mktemp)
-          for build in $EXPECTED_BUILDS; do
-            loader=${build%%:*}; mc=${build##*:}
-            if [ -n "$MC_FILTER" ] && [ "$mc" != "$MC_FILTER" ]; then continue; fi
-            jar="releases/fisherman_house-$loader-$mc-$VERSION.jar"
-            if [ ! -f "$jar" ]; then echo "Missing $jar" >&2; exit 1; fi
+          # Exactly the 8 convention jars, one per loader + Minecraft pair, or the run stops here.
+          python3 scripts/check_targets.py jars --version "$VERSION" --dir dist --list-file all-jars.txt
+          mapfile -t JARS < all-jars.txt
+          for jar in "${JARS[@]}"; do
+            name=$(basename "$jar")
+            rest=${name#fisherman_house-}; loader=${rest%%-*}; rest=${rest#*-}; mc=${rest%-"$VERSION".jar}
             meta=$(node .github/scripts/detect-jar-meta.js "$jar")
-            [ "$meta" = "{\"loader\":\"$loader\",\"gv\":\"$mc\"}" ] || { echo "$jar parsed as $meta" >&2; exit 1; }
+            [ "$meta" = "{\"loader\":\"$loader\",\"gv\":\"$mc\"}" ] || { echo "::error::$jar parsed as $meta"; exit 1; }
             # The jar's own metadata must name the mod and this version.
             case $loader in
               fabric) inner=$(unzip -p "$jar" fabric.mod.json) ;;
               forge) inner=$(unzip -p "$jar" META-INF/mods.toml) ;;
               neoforge) inner=$(unzip -p "$jar" META-INF/neoforge.mods.toml) ;;
             esac
-            grep -q 'fisherman_house' <<<"$inner" || { echo "$jar: mod id missing from its metadata" >&2; exit 1; }
-            grep -q "$VERSION" <<<"$inner" || { echo "$jar: version $VERSION missing from its metadata" >&2; exit 1; }
-            echo "$jar" >> "$list"
+            grep -q 'fisherman_house' <<<"$inner" || { echo "::error::$jar: mod id missing from its metadata"; exit 1; }
+            grep -qF "$VERSION" <<<"$inner" || { echo "::error::$jar: version $VERSION missing from its metadata"; exit 1; }
           done
-          if [ ! -s "$list" ]; then echo "No jars selected" >&2; exit 1; fi
-          cat "$list"
-          cp "$list" jar-list.txt
+          if [ -n "$MC_FILTER" ]; then
+            case "$MC_FILTER" in
+              1.20.1|1.21.1|26.2|26.3) ;;
+              *) echo "::error::minecraft_version must be 1.20.1, 1.21.1, 26.2 or 26.3, not ${MC_FILTER}"; exit 1 ;;
+            esac
+            FILTERED=()
+            for jar in "${JARS[@]}"; do
+              if [[ "$(basename "$jar")" == fisherman_house-*-"${MC_FILTER}"-"${VERSION}".jar ]]; then
+                FILTERED+=("$jar")
+              fi
+            done
+            JARS=("${FILTERED[@]}")
+            echo "Uploading only Minecraft ${MC_FILTER}:"
+          fi
+          printf '%s\n' "${JARS[@]}" | tee jar-list.txt
 
-      - name: Upload to Modrinth and CurseForge
-        if: ${{ !inputs.dry_run }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: verified-release
+          path: dist/*.jar
+
+      - name: Same-day guard (again, right before upload)
+        if: ${{ inputs.dry_run != 'true' }}
+        env:
+          MODRINTH_ID: ${{ vars.MODRINTH_ID || secrets.MODRINTH_ID || 'Dku9hJfB' }}
+          CURSEFORGE_ID: ${{ vars.CURSEFORGE_ID || secrets.CURSEFORGE_ID || '1388089' }}
+          CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
+          GITHUB_TOKEN: ${{ github.token }}
+          PUBLISH_WORKFLOW: publish.yml
+          UPLOAD_STEP: Upload Modrinth + CurseForge
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: node scripts/same_day_guard.mjs
+
+      - name: Upload Modrinth + CurseForge
+        if: ${{ inputs.dry_run != 'true' }}
         env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
           CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
@@ -143,6 +265,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          test -n "${MODRINTH_ID:-}" && test -n "${CURSEFORGE_ID:-}"
           node <<'NODE'
           const fs = require('fs');
           const path = require('path');
@@ -272,7 +395,7 @@ jobs:
 
       # CurseForge has no API for the project description: paste marketing/curseforge/description.md there by hand.
       - name: Update the Modrinth listing
-        if: ${{ inputs.update_listing && !inputs.dry_run }}
+        if: ${{ inputs.update_listing == 'true' && inputs.dry_run != 'true' }}
         env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
           MODRINTH_ID: ${{ vars.MODRINTH_ID || secrets.MODRINTH_ID || 'Dku9hJfB' }}
@@ -284,8 +407,8 @@ jobs:
           (async () => {
             const headers = { Authorization: process.env.MODRINTH_TOKEN };
             const project = `https://api.modrinth.com/v2/project/${process.env.MODRINTH_ID}`;
-            const body = fs.readFileSync('marketing/curseforge/description.md', 'utf8');
-            const description = fs.readFileSync('marketing/curseforge/summary.txt', 'utf8').trim();
+            const body = fs.readFileSync('marketing/modrinth/description.md', 'utf8');
+            const description = fs.readFileSync('marketing/modrinth/summary.txt', 'utf8').trim();
             const res = await fetch(project, {
               method: 'PATCH',
               headers: { ...headers, 'Content-Type': 'application/json' },

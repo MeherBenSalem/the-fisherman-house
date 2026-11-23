@@ -25,13 +25,12 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 TOOLS = Path(__file__).resolve().parent
 NS = 'fisherman_house'
-VERSIONS = ['1.20.1', '1.21.1', '26.1.2', '26.2', '26.3']
-LOADERS = {'1.20.1': ['fabric', 'forge'], '1.21.1': ['fabric', 'neoforge'], '26.1.2': ['fabric', 'neoforge'],
-           '26.2': ['fabric', 'neoforge'], '26.3': ['fabric', 'neoforge']}
+VERSIONS = ['1.20.1', '1.21.1', '26.2', '26.3']
+LOADERS = {'1.20.1': ['fabric', 'forge'], '1.21.1': ['fabric', 'neoforge'], '26.2': ['fabric', 'neoforge'],
+           '26.3': ['fabric', 'neoforge']}
 PACK = {
     '1.20.1': {'pack_format': 15},
     '1.21.1': {'pack_format': 34},
-    '26.1.2': {'min_format': 84, 'max_format': 101},
     '26.2': {'min_format': 88, 'max_format': 121},
     '26.3': {'min_format': 88, 'max_format': 121},
 }
@@ -538,8 +537,8 @@ def loader_data(d: Dialect):
         else:
             modifier = {'type': 'neoforge:add_table', 'conditions': [{'condition': 'neoforge:loot_table_id', 'loot_table_id': 'minecraft:gameplay/fishing'}],
                         'table': f'{NS}:gameplay/rod_extras'}
-            # NeoForge reads the modifier folder on its own from 26.2; before that, only what this list names.
-            if d.v in ('1.21.1', '26.1.2'):
+            # NeoForge reads the modifier folder on its own from 26.2; before that (1.21.1), only what this list names.
+            if d.v == '1.21.1':
                 write(data / 'neoforge/loot_modifiers/global_loot_modifiers.json', {'replace': False, 'entries': [f'{NS}:rod_extras']})
         write(data / NS / 'loot_modifiers/rod_extras.json', modifier)
 

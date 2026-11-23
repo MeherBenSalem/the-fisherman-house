@@ -1,37 +1,77 @@
 # Gradle
 .gradle/
 build/
-**/build/
-out/
-bin/
+!gradle/wrapper/gradle-wrapper.jar
 
-# IDE
-.idea/
-*.iml
-*.ipr
-*.iws
-.vscode/
+# Eclipse
+.metadata/
+.settings/
 .classpath
 .project
-.settings/
+bin/
 
-# Minecraft run directories
-**/run/
-**/runs/
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
 
-# Generated resources
-**/src/generated/
+# VS Code / Cursor
+.vscode/
+*.code-workspace
+.cursor/
 
-# OS
+# MacOS
 .DS_Store
+
+# Windows
 Thumbs.db
+ehthumbs.db
+Desktop.ini
 
 # Logs
+logs/
 *.log
+build_log.txt
+build_output.txt
+dep_warning.txt
+debug.log
+
+# Run folders
+run/
+runs/
+/test/
+
+# Archives / built artifacts (do not commit jars, except the release jars the publish workflow uploads)
+*.jar
+!releases/*.jar
+*.war
+*.zip
+*.tar
+*.tar.gz
+dist/
+
+# Keep the Gradle wrapper jar
+!**/gradle/wrapper/gradle-wrapper.jar
 
 # Env / secrets
 .env
 .env.*
+!.env.example
+
+# Temp
+input.txt
+output.txt
+
+# Python
+__pycache__/
+*.pyc
+
+# Generated
+**/src/generated/
+
+# Local keys and credentials
 *.pem
 *.jks
 credentials.json
@@ -39,8 +79,6 @@ credentials.json
 # QA scratch output
 marketing/images/explore/
 marketing/source/.render-*.html
-**/__pycache__/
-**/logs/
 
 # The reel's videos are build outputs (marketing/reel/make.sh): delivered directly, never committed
 marketing/reel/*.mp4

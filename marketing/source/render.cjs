@@ -6,12 +6,11 @@ const fs = require('fs');
 const { chromium } = require('playwright');
 
 // The release and the supported Minecraft versions. Adding a version is one line here
-// (plus one row in the download table of curseforge/description.md).
+// (plus one row in the download table of curseforge/description.md, then python3 tools/make_modrinth_md.py .).
 const RELEASE = { version: '2.0', name: 'The Living Coast' };
 const VERSIONS = [
   { minecraft: '1.20.1', loaders: ['Fabric', 'Forge'] },
   { minecraft: '1.21.1', loaders: ['Fabric', 'NeoForge'] },
-  { minecraft: '26.1.2', loaders: ['Fabric', 'NeoForge'] },
   { minecraft: '26.2', loaders: ['Fabric', 'NeoForge'] },
   { minecraft: '26.3', loaders: ['Fabric', 'NeoForge'] },
 ];
@@ -239,7 +238,7 @@ const assets = {
       'Worlds from 1.x keep loading', 'No extra library to install'],
     art: `<div style="display:flex;flex-direction:column;gap:18px">
       <div class="frame" style="background:#081a27;border-color:${C.lantern}">${configPanel()}</div>
-      ${stats([['Loaders', 'Fabric · NeoForge · Forge', 2], ['Versions', '5']])}</div>` }),
+      ${stats([['Loaders', 'Fabric · NeoForge · Forge', 2], ['Versions', String(VERSIONS.length)]])}</div>` }),
 };
 
 const HEADERS = {

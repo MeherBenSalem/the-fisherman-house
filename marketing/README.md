@@ -6,6 +6,8 @@ Listing copy and artwork for CurseForge and Modrinth.
 |------|------------|
 | `curseforge/description.md` | The project description (Markdown; also works on Modrinth). Images load from this repo's `main` branch. |
 | `curseforge/summary.txt` | The one-line summary (under 250 characters). |
+| `modrinth/description.md` | The Modrinth description, made from the CurseForge copy by `python3 tools/make_modrinth_md.py .` (the screenshots go in the project's Gallery tab instead). |
+| `modrinth/summary.txt` | The Modrinth summary (the same text). The Publish workflow's `update_listing` option sends both to Modrinth. |
 | `images/banner.png` | 1800×600 header banner. |
 | `images/icon.png` | 512×512 project icon (also the mod's in-jar `logo.png`). |
 | `images/card-*.png` | 1600×900 feature cards used in the description and as gallery images. |
@@ -32,7 +34,9 @@ NODE_PATH="$(npm root -g)" node marketing/source/render.cjs card-crabpot  # one 
 ```
 
 The release name and the supported Minecraft versions and loaders are at the top of `render.cjs`. Supporting a new
-Minecraft version means adding one line there, plus one row to the download table in `description.md`. After
+Minecraft version means adding one line there, plus one row to the download table in `curseforge/description.md`, then
+running `python3 tools/make_modrinth_md.py .` to refresh the Modrinth copy. Only the NightBeam convention's targets
+are listed: 1.20.1 (Fabric, Forge) and 1.21.1, 26.2, 26.3 (Fabric, NeoForge). After
 changing the icon, copy `images/icon.png` to every workspace's `common/src/main/resources/logo.png`.
 
 ## Retaking the screenshots

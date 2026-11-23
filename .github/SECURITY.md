@@ -2,7 +2,15 @@
 
 ## Supported versions
 
-Security fixes are targeted at the latest release of each actively maintained Minecraft version tree in this repository (`1.20.1`, `1.21.1`, `26.1.2`, `26.2`, `26.3`).
+Security fixes are generally applied to the latest release line of
+Fisherman's Coast for the actively maintained Minecraft targets:
+
+- Minecraft 1.20.1 (Fabric, Forge)
+- Minecraft 1.21.1 (Fabric, NeoForge)
+- Minecraft 26.2 (Fabric, NeoForge)
+- Minecraft 26.3 (Fabric, NeoForge)
+
+Older releases, and Minecraft versions or loaders not listed here, do not receive fixes.
 
 ## Reporting a vulnerability
 

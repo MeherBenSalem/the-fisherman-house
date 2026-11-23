@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # Runs coast_checks.py (server and client checks) on a fresh world for each build:
-#   tools/qa/run_matrix.sh [ws:loader ...]     (default: all ten)
+#   tools/qa/run_matrix.sh [ws:loader ...]     (default: all eight)
 # Results go to $QA_LOGS/results/<ws>-<loader>.txt and screenshots to $QA_LOGS/shots/<ws>-<loader>/; a summary line
 # per build is printed.
 set -u
 ROOT=$(cd "$(dirname "$0")/../.." && pwd)
 LOGS=${QA_LOGS:-/tmp/fc-qa}
 mkdir -p "$LOGS/results"
-BUILDS=${*:-"1.20.1:fabric 1.20.1:forge 1.21.1:fabric 1.21.1:neoforge 26.1.2:fabric 26.1.2:neoforge 26.2:fabric 26.2:neoforge 26.3:fabric 26.3:neoforge"}
+BUILDS=${*:-"1.20.1:fabric 1.20.1:forge 1.21.1:fabric 1.21.1:neoforge 26.2:fabric 26.2:neoforge 26.3:fabric 26.3:neoforge"}
 QA="$ROOT/tools/qa"
 
 wait_for() {  # file, pattern, seconds
