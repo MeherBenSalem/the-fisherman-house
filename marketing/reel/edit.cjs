@@ -188,7 +188,7 @@ html, body { width: 1080px; height: 1920px; overflow: hidden; background: #000; 
     <svg width="56" height="56" viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z" fill="${C.deep}"/></svg>
     Send this to your fishing buddy
   </div>
-  <div class="sub" id="endWhere" style="margin-top: 30px; font-size: 44px; color: ${C.sand};">CurseForge & Modrinth</div>
+  <div class="sub" id="endWhere" style="margin-top: 30px; font-size: 44px; color: ${C.sand};">CurseForge</div>
 </div>
 
 <!-- Burned-in captions, word-timed: black type on highlight boxes, the spoken word yellow -->

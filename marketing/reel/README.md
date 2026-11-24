@@ -75,8 +75,7 @@ Minecraft beaches, finally worth it 🎣 #minecraft #minecraftmods #moddedminecr
 Pinned comment:
 
 ```
-Free on CurseForge and Modrinth (Fabric, NeoForge, Forge · 1.20.1 to 26.3):
-https://modrinth.com/mod/fisherman-coast
+Free on CurseForge (Fabric, NeoForge, Forge · 1.20.1 to 26.3):
 https://www.curseforge.com/minecraft/mc-mods/the-fisherman-house
 ```
 

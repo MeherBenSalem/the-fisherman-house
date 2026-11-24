@@ -6,7 +6,7 @@ const fs = require('fs');
 const { chromium } = require('playwright');
 
 // The release and the supported Minecraft versions. Adding a version is one line here
-// (plus one row in the download table of curseforge/description.md, then python3 tools/make_modrinth_md.py .).
+// (plus one row in the download table of curseforge/description.md).
 const RELEASE = { version: '2.0', name: 'The Living Coast' };
 const VERSIONS = [
   { minecraft: '1.20.1', loaders: ['Fabric', 'Forge'] },

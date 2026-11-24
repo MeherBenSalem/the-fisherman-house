@@ -152,11 +152,11 @@ for a version live in `patchnotes/<version>.md`.
 ## Releasing
 
 CI (`.github/workflows/ci.yml`) builds all 8 jars on every push to `main` that touches the build, and checks that the
-generated assets and data match `tools/`. Publishing to Modrinth and CurseForge is `.github/workflows/publish.yml`,
+generated assets and data match `tools/`. Publishing (to CurseForge only) is `.github/workflows/publish.yml`,
 run by hand (`version`, `dry_run`) or by a `v*.*.*` tag; it never runs on a plain push. It refuses a second release of
 the mod on the same day (Africa/Tunis), takes the jars from `releases/` (the in-game-tested ones), the GitHub Release
-or a build from source, and fails unless exactly the 8 jars are found. It needs the secrets `MODRINTH_TOKEN`,
-`CURSEFORGE_TOKEN`, `CURSEFORGE_API_KEY` and the variables `MODRINTH_ID`, `CURSEFORGE_ID`.
+or a build from source, and fails unless exactly the 8 jars are found. It needs the secrets `CURSEFORGE_TOKEN`
+(upload) and `CURSEFORGE_API_KEY` (Core API, for the same-day guard) and the variable `CURSEFORGE_ID`.
 
 ## Tools
 
@@ -169,7 +169,7 @@ or a build from source, and fails unless exactly the 8 jars are found. It needs 
   game, `run_matrix.sh` runs it on every build, `prodserver.sh` tests a release jar on a real server, `migration.sh`
   opens a 1.1.0 world with 2.0, `rarity.py` measures how far apart the structures are,
   `marketing_shots.py` captures the listing screenshots.
-- [`marketing/`](marketing): the CurseForge/Modrinth description, listing images and how to regenerate them.
+- [`marketing/`](marketing): the CurseForge description, listing images and how to regenerate them.
 
 ## Links
 
